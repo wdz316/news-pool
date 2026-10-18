@@ -120,7 +120,7 @@ npm run audit
 7. 顶栏 **统计** → 月历网格，确认每天的「准备 / 已播」数。
 8. 顶栏 **外观** → 挑一套风格（如「暗夜玻璃」「赛博霓虹」）→ 界面立即变样；刷新后仍是你选的；换个浏览器 / 无痕窗口仍是默认（各人各选）。
 
-自动化冒烟测试（129 项）：
+自动化冒烟测试（135 项）：
 
 ```bash
 npm test        # 或 node verify/smoke.cjs
@@ -138,8 +138,12 @@ news-pool/
   SECURITY.md             安全与隐私说明（怎么自证没后门）
   部署指南.md              局域网 / 隧道 / VPS 三种部署
   给访客的一页纸.md         发给用的人看的说明
+  THIRD-PARTY-NOTICES.md  第三方组件与素材许可清单（含免责说明）
+  docs/使用手册.html       使用手册（可 npm run manual 打成 PDF）
   scripts/
     audit.cjs   无后门自查脚本（npm run audit）
+    publish.cjs 一键发布脚本（npm run release）
+    manual.cjs  把 docs/使用手册.html 打成 PDF（npm run manual）
   src/
     server.js    HTTP 服务 + REST + WebSocket 广播
     db.js        池注册表 + 每池 SQLite + 用户/会话/条目
@@ -158,7 +162,7 @@ news-pool/
 # 在项目根目录
 git init
 git add .
-git commit -m "共享新闻池 v0.3.2"
+git commit -m "共享新闻池 v0.4.1"
 git branch -M main
 git remote add origin https://github.com/<你的用户名>/news-pool.git
 git push -u origin main
@@ -187,4 +191,13 @@ npm run manual           # 用本机 Edge/Chrome 把 docs/使用手册.html 打�
 
 ## 📄 License
 
-[MIT](./LICENSE)
+本项目代码以 **[MIT](./LICENSE)** 许可发布 —— 你可以自由使用、修改、分发，**包括商业用途**，只需保留版权声明与许可证文本。
+
+第三方依赖与素材的许可清单见 **[THIRD-PARTY-NOTICES.md](./THIRD-PARTY-NOTICES.md)**（全部为 MIT / ISC / Apache-2.0 / BSD 等宽松许可，**无 GPL / AGPL**）。
+
+## ⚖️ 免责声明
+
+- 本软件按「**原样（AS IS）**」提供，不附带任何明示或暗示的担保，包括但不限于适销性、特定用途适用性及不侵权担保。
+- 作者不对使用本软件所产生的任何直接或间接后果（包括但不限于数据丢失、业务中断、法律纠纷）承担责任。**请自行备份 `data/` 目录。**
+- 本软件会抓取公开网页的标题/摘要并访问公开搜索服务，使用者须**自行确保**其使用方式符合相关网站的服务条款与当地法律法规。
+- 本项目与所抓取内容的版权方、所访问服务的提供方**无任何关联**。

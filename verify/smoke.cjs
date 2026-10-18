@@ -483,6 +483,16 @@ async function main() {
     check(!!(pkgJson.repository && String(pkgJson.repository.url || '').includes('github.com')), 'package.json 含 repository（发布工具据此定位仓库）');
     check(readRoot('README.md').includes('您可以使用 AI 代理进行修改'), 'README 含「可用 AI 代理修改」说明');
 
+    console.log('\n[15] 开源合规 / 许可与免责');
+    const notices = readRoot('THIRD-PARTY-NOTICES.md');
+    check(notices.includes('bcryptjs') && notices.includes('better-sqlite3') && notices.includes('ws'), 'THIRD-PARTY-NOTICES.md 列出全部直接依赖');
+    check(notices.includes('MIT') && /不含 GPL|无 GPL/.test(notices), 'THIRD-PARTY-NOTICES.md 含许可证汇总与无 copyleft 结论');
+    check(notices.includes('OFL') && notices.includes('未分发'), 'THIRD-PARTY-NOTICES.md 说明字体许可（OFL）且未分发字体文件');
+    check(readRoot('LICENSE').includes('MIT'), 'LICENSE 为 MIT');
+    const readmeFinal = readRoot('README.md');
+    check(readmeFinal.includes('免责声明'), 'README 含免责声明');
+    check(readmeFinal.includes('THIRD-PARTY-NOTICES.md'), 'README 链到第三方许可清单');
+
     ws.close();
   } finally {
     server.kill();
