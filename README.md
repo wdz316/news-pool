@@ -158,7 +158,7 @@ news-pool/
 # 在项目根目录
 git init
 git add .
-git commit -m "共享新闻池 v0.3.1"
+git commit -m "共享新闻池 v0.3.2"
 git branch -M main
 git remote add origin https://github.com/<你的用户名>/news-pool.git
 git push -u origin main
