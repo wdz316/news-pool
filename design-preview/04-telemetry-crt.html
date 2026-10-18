@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>新闻池 · 方案 04 · 战术终端</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --crt:#0a0a0a;--crt-2:#111214;--panel:#101113;
+  --line:#2a2c30;--line-2:#3a3d42;
+  --phos:#eaeaea;--phos-2:#9a9c9f;--dim:#6a6d70;
+  --red:#ff2a2a;--grn:#4af626;
+  --mono:'IBM Plex Mono','JetBrains Mono','SF Mono',Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--crt);color:var(--phos);font-family:var(--mono);font-size:13px;line-height:1.5}
+/* CRT 扫描线 + 磷光辉光（fixed, pointer-events:none） */
+.scan{position:fixed;inset:0;pointer-events:none;z-index:50;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.16) 2px,rgba(0,0,0,.16) 4px)}
+.vig{position:fixed;inset:0;pointer-events:none;z-index:49;
+  background:radial-gradient(120% 120% at 50% 50%,transparent 55%,rgba(0,0,0,.55) 100%)}
+.wrap{position:relative;z-index:2;max-width:1100px;margin:0 auto;padding:20px 22px 70px}
+a{color:inherit;text-decoration:none}
+
+/* ── 顶栏：技术框 ── */
+.bar{border:1px solid var(--line);background:var(--panel);display:flex;align-items:stretch;margin-bottom:14px}
+.bar .mark{padding:12px 16px;border-right:1px solid var(--line);font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.bar .mark b{color:var(--red)}
+.bar .stat{padding:12px 16px;border-right:1px solid var(--line);color:var(--dim);letter-spacing:.06em;text-transform:uppercase;font-size:11px}
+.bar .stat b{color:var(--phos)}
+.bar .who{margin-left:auto;padding:12px 16px;color:var(--dim);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.bar .who b{color:var(--grn)}
+
+.cmd{border:1px solid var(--line);background:var(--panel);display:grid;grid-template-columns:auto 1fr auto;margin-bottom:22px}
+.cmd .ps{padding:11px 14px;color:var(--grn);border-right:1px solid var(--line);white-space:nowrap}
+.cmd input{border:0;outline:0;background:transparent;color:var(--phos);font-family:var(--mono);font-size:13px;padding:11px 14px;width:100%}
+.cmd input::placeholder{color:#4c4f52}
+.btn{border:0;border-left:1px solid var(--line);background:transparent;color:var(--phos);font-family:var(--mono);font-size:12px;
+  letter-spacing:.1em;text-transform:uppercase;padding:0 22px;cursor:pointer}
+.btn:hover{background:var(--red);color:#000}
+
+/* ── 分组 ── */
+.sec{border:1px solid var(--line);margin-bottom:18px}
+.sechead{display:flex;align-items:center;gap:14px;padding:10px 14px;background:var(--crt-2);border-bottom:1px solid var(--line)}
+.sechead .h{font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.sechead .h i{color:var(--red);font-style:normal}
+.sechead .cnt{color:var(--dim);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.sechead .cnt b{color:var(--phos)}
+.sechead .spill{margin-left:auto;color:var(--dim);font-size:11px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);padding:5px 10px;cursor:pointer}
+.sechead .spill:hover{border-color:var(--grn);color:var(--grn)}
+
+/* ── 条目：四列台账 ── */
+.log{display:grid;grid-template-columns:52px 74px 1fr 220px;font-size:12.5px}
+.log.hdr{background:var(--crt-2);color:var(--dim);text-transform:uppercase;letter-spacing:.08em;font-size:10px}
+.log.hdr>div{padding:8px 12px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.log .r>*{padding:12px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.log .r:last-child>*{border-bottom:0}
+.log .r:hover{background:#141517}
+.log .seq{color:var(--dim)}
+.log .st{text-transform:uppercase;letter-spacing:.04em;font-size:11px}
+.log .st.pending{color:var(--red)}
+.log .st.done{color:var(--grn)}
+.log .st.skipped{color:var(--dim)}
+.log .ti{min-width:0}
+.log .ti .t{font-weight:500;line-height:1.4}
+.log .ti .t:hover{color:var(--grn)}
+.log .ti .t a{text-decoration:none}
+.log .ti .m{color:var(--dim);font-size:11px;margin-top:5px;letter-spacing:.03em}
+.log .ti .m b{color:var(--phos-2);font-weight:400}
+.log .ti .nt{margin-top:8px;border-left:2px solid var(--line-2);padding:7px 10px;color:var(--phos-2);font-size:11.5px}
+.log .ti .nt a{color:var(--grn);text-decoration:underline;text-underline-offset:2px;word-break:break-all}
+.log .ops{display:flex;gap:6px;flex-wrap:wrap;align-content:flex-start}
+.op{border:1px solid var(--line);background:transparent;color:var(--phos-2);font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.08em;text-transform:uppercase;padding:5px 9px;cursor:pointer}
+.op:hover{border-color:var(--grn);color:var(--grn)}
+.op.hot{border-color:var(--red);color:var(--red)}
+.op.hot:hover{background:var(--red);color:#000}
+
+/* 唯一使用终端绿作实体强调的元素：LIVE 指示灯 */
+.live{display:inline-flex;align-items:center;gap:6px;color:var(--grn);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.live i{width:7px;height:7px;background:var(--grn);border-radius:50%;box-shadow:0 0 8px var(--grn);animation:blink 1.6s steps(2) infinite}
+@keyframes blink{50%{opacity:.25}}
+
+.spec{border:1px solid var(--line);margin-top:26px}
+.spec .sh{padding:10px 14px;background:var(--crt-2);border-bottom:1px solid var(--line);color:var(--red);letter-spacing:.1em;text-transform:uppercase;font-size:11px}
+.spec .grid{display:grid;grid-template-columns:repeat(3,1fr)}
+.spec .grid>div{padding:16px;border-right:1px solid var(--line);font-size:12px;color:var(--phos-2);line-height:1.7}
+.spec .grid>div:last-child{border-right:0}
+.spec .grid b{color:var(--phos);display:block;margin-bottom:6px;letter-spacing:.06em;text-transform:uppercase;font-size:11px}
+.sw{display:inline-block;width:20px;height:20px;border:1px solid var(--line);margin:10px 6px 0 0}
+@media(max-width:820px){
+  .log{grid-template-columns:44px 1fr}
+  .log .ops{grid-column:1/-1;border-right:0}
+  .bar .stat:nth-child(n+3){display:none}
+  .spec .grid{grid-template-columns:1fr}
+  .spec .grid>div{border-right:0;border-bottom:1px solid var(--line)}
+}
+@media(prefers-reduced-motion:reduce){.live i{animation:none}}
+</style>
+</head>
+<body>
+<div class="scan"></div>
+<div class="vig"></div>
+<div class="wrap">
+
+  <div class="bar">
+    <div class="mark">NEWS-POOL<b>//</b>DEMO-01</div>
+    <div class="stat">TOTAL <b>04</b></div>
+    <div class="stat">PENDING <b>02</b></div>
+    <div class="stat">ON-AIR <b>01</b></div>
+    <div class="who">OPERATOR <b>阿凯</b> · <span class="live"><i></i>LINK OK</span></div>
+  </div>
+
+  <div class="cmd">
+    <span class="ps">&gt;_</span>
+    <input placeholder="paste news url — 回车加入待播队列" />
+    <button class="btn">ADD</button>
+  </div>
+
+  <section class="sec">
+    <div class="sechead">
+      <span class="h"><i>&gt;</i> 2026-10-18 · 今天</span>
+      <span class="cnt">rows <b>03</b> / pending <b>01</b> / aired <b>01</b></span>
+      <span class="spill">SPILL &gt;&gt; 顺延未播到 10-19</span>
+    </div>
+    <div class="log hdr">
+      <div>SEQ</div><div>STATUS</div><div>HEADLINE / META</div><div>OPERATIONS</div>
+    </div>
+    <div class="log r">
+      <div class="seq">01</div>
+      <div class="st pending">● PENDING</div>
+      <div class="ti">
+        <div class="t"><a href="#">国产大模型 Qwen3 发布，官方称推理成本下降 40%</a></div>
+        <div class="m">SRC <b>机器之心</b> · ADD <b>小满</b> · 12MIN AGO · ★ 重点</div>
+        <div class="nt">配图用发布会现场图；基准对比表 <a href="#">https://example.com/qwen3-bench</a></div>
+      </div>
+      <div class="ops">
+        <button class="op hot" title="点击标记为已播">[ 标记已播 ]</button>
+        <button class="op">[ ☆ 重点 ]</button>
+        <button class="op">[ ⋯ ]</button>
+      </div>
+    </div>
+    <div class="log r">
+      <div class="seq">02</div>
+      <div class="st done">● ON-AIR</div>
+      <div class="ti">
+        <div class="t"><a href="#">苹果 M5 芯片跑分曝光，单核提升约 18%</a></div>
+        <div class="m">SRC <b>IT之家</b> · AIRED BY <b>阿凯</b> @ 09:20</div>
+      </div>
+      <div class="ops">
+        <button class="op" title="点击改回待播">[ 改回待播 ]</button>
+        <button class="op">[ ☆ 重点 ]</button>
+        <button class="op">[ ⋯ ]</button>
+      </div>
+    </div>
+    <div class="log r">
+      <div class="seq">03</div>
+      <div class="st skipped">● SKIPPED</div>
+      <div class="ti">
+        <div class="t" style="color:var(--dim)"><a href="#">某大厂裁员传闻（未证实）</a></div>
+        <div class="m">SRC <b>UNVERIFIED</b> · ADD <b>老周</b> · YESTERDAY</div>
+      </div>
+      <div class="ops">
+        <button class="op" title="点击恢复待播">[ 恢复待播 ]</button>
+        <button class="op">[ ☆ 重点 ]</button>
+        <button class="op">[ ⋯ ]</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sechead">
+      <span class="h"><i>&gt;</i> 2026-10-19 · 明天</span>
+      <span class="cnt">rows <b>01</b> / pending <b>01</b></span>
+      <span class="spill">SPILL &gt;&gt; 顺延未播到 10-20</span>
+    </div>
+    <div class="log hdr">
+      <div>SEQ</div><div>STATUS</div><div>HEADLINE / META</div><div>OPERATIONS</div>
+    </div>
+    <div class="log r">
+      <div class="seq">04</div>
+      <div class="st pending">● PENDING</div>
+      <div class="ti">
+        <div class="t"><a href="#">欧盟《AI 法案》最终文本审议通过</a></div>
+        <div class="m">SRC <b>Reuters</b> · ADD <b>老周</b> · 1H AGO</div>
+        <div class="nt">重点讲对开源模型的影响条款，时长控制 3 分钟。</div>
+      </div>
+      <div class="ops">
+        <button class="op hot" title="点击标记为已播">[ 标记已播 ]</button>
+        <button class="op">[ ☆ 重点 ]</button>
+        <button class="op">[ ⋯ ]</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="spec">
+    <div class="sh">SCHEDULE / 方案 04 · 战术终端（TACTICAL TELEMETRY CRT）—— 规格</div>
+    <div class="grid">
+      <div>
+        <b>配色</b>
+        去激活 CRT #0A0A0A + 磷白 #EAEAEA；警示红 #FF2A2A 用于待播态与危险操作；
+        终端绿 #4AF626 只保留给一个元素（LINK 指示灯 / 链接 / hover）。叠层扫描线 + 暗角。
+        <div><span class="sw" style="background:#0a0a0a"></span><span class="sw" style="background:#eaeaea"></span><span class="sw" style="background:#ff2a2a"></span><span class="sw" style="background:#4af626"></span></div>
+      </div>
+      <div>
+        <b>版面</b>
+        1100px 台账网格（SEQ / STATUS / HEADLINE / OPS 四列），等宽字体贯穿全站；
+        高密度表格化数据，方括号 [ ] 与 ASCII 箭头 &gt; &gt;&gt; 作结构装饰；零圆角。
+      </div>
+      <div>
+        <b>按钮</b>
+        全部方括号包起来的命令块 [ 标记已播 ]，hover 变绿、危险操作变红实底；
+        状态为文本标签 ● PENDING / ● ON-AIR / ● SKIPPED（点状 + 色彩编码）。
+        只用 transform/opacity 做微反馈；prefers-reduced-motion 下停掉指示灯闪烁。
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>新闻池 · 方案 08 · 双色丝网</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800;900&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --paper:#f4f1ea;--paper-2:#ece7db;
+  --blue:#1b3a6b;--blue-2:#274e8a;
+  --pink:#ff4d6d;--pink-2:#ff6d88;
+  --ink:#16181d;--muted:#5f6470;
+  --dot:rgba(27,58,107,.16);
+  --disp:'Archivo','Space Grotesk','Noto Sans SC',sans-serif;
+  --body:'Space Grotesk','PingFang SC','Microsoft YaHei',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6}
+/* 半调网点底纹 */
+.halftone{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(circle,var(--dot) 1px,transparent 1.4px);background-size:6px 6px;opacity:.7}
+.wrap{position:relative;z-index:2;max-width:1010px;margin:0 auto;padding:0 26px 90px}
+a{color:inherit;text-decoration:none}
+
+/* ── 斜贴的报头 ── */
+.masthead{display:flex;align-items:center;gap:20px;padding:34px 0 26px;border-bottom:3px solid var(--ink)}
+.logo{font-family:var(--disp);font-weight:900;font-size:30px;letter-spacing:-.03em;color:var(--blue);
+  text-shadow:3px 3px 0 var(--pink);text-transform:uppercase}
+.logo small{display:block;font-family:var(--body);font-weight:500;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);text-shadow:none;margin-top:3px}
+.filters{margin-left:auto;display:flex;gap:8px}
+.f{font-family:var(--disp);font-weight:600;font-size:12.5px;letter-spacing:.02em;border:2px solid var(--ink);padding:6px 13px;cursor:pointer;background:var(--paper)}
+.f.on{background:var(--pink);color:#fff;border-color:var(--pink);box-shadow:2px 2px 0 var(--ink)}
+.f:hover{transform:translate(-1px,-1px);box-shadow:2px 2px 0 var(--blue)}
+.who{font-family:var(--disp);font-weight:600;font-size:12.5px;color:var(--muted);margin-left:16px}
+
+/* ── 输入 ── */
+.add{display:flex;gap:0;margin:26px 0 42px;border:2px solid var(--ink);box-shadow:5px 5px 0 var(--blue)}
+.add input{flex:1;border:0;outline:0;background:var(--paper);padding:15px 18px;font-family:var(--body);font-size:15px;color:var(--ink)}
+.add input::placeholder{color:#9a958a}
+.btn{border:0;border-left:2px solid var(--ink);background:var(--pink);color:#fff;font-family:var(--disp);font-weight:800;font-size:13.5px;
+  letter-spacing:.04em;text-transform:uppercase;padding:0 26px;cursor:pointer}
+.btn:hover{background:var(--blue)}
+
+/* ── 分组标题：超粗 + 双色位移标题 ── */
+.dayhead{display:flex;align-items:baseline;gap:14px;margin:40px 0 16px}
+.dnum{font-family:var(--disp);font-weight:900;font-size:clamp(2.6rem,7vw,4.6rem);line-height:.82;letter-spacing:-.05em;color:var(--blue);
+  text-shadow:4px 4px 0 rgba(255,77,109,.85)}
+.dlbl{font-family:var(--disp);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:.06em}
+.dlbl span{color:var(--muted);font-weight:600}
+.spill{margin-left:auto;font-family:var(--disp);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.04em;
+  border-bottom:2px solid var(--pink);cursor:pointer;padding-bottom:1px}
+.spill:hover{color:var(--pink)}
+
+/* ── 条目：错版双色卡 ── */
+.item{margin-bottom:14px}
+.frame{border:2px solid var(--ink);background:var(--paper);padding:20px 22px;position:relative;
+  transition:transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s cubic-bezier(.22,1,.36,1)}
+.item:hover .frame{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--pink)}
+.item.done:hover .frame{box-shadow:6px 6px 0 var(--blue)}
+.summary{display:flex;gap:20px}
+.smain{flex:1;min-width:0}
+.t{font-family:var(--disp);font-weight:800;font-size:18.5px;letter-spacing:-.015em;line-height:1.35}
+.t:hover{color:var(--pink)}
+.meta{font-size:12.5px;color:var(--muted);margin-top:7px;font-weight:500}
+.meta b{color:var(--ink)}
+.note{margin-top:13px;background:var(--paper-2);border-left:4px solid var(--pink);padding:10px 13px;font-size:13.5px;color:var(--ink)}
+.note a{color:var(--blue);text-decoration:underline;text-underline-offset:2px;word-break:break-all;font-weight:600}
+.side{display:flex;flex-direction:column;align-items:flex-end;gap:9px;flex:0 0 auto}
+/* 状态：粗描边小方块，双色错版 */
+.state{font-family:var(--disp);font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  border:2px solid var(--ink);background:var(--paper);color:var(--ink);padding:5px 11px;cursor:pointer}
+.state.pending{background:var(--pink);color:#fff;border-color:var(--pink);box-shadow:2px 2px 0 var(--ink)}
+.state.done{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:2px 2px 0 var(--ink)}
+.state.skipped{color:var(--muted);border-color:var(--muted);box-shadow:2px 2px 0 var(--paper-2)}
+.state:hover{transform:translate(-1px,-1px)}
+.tag{font-family:var(--disp);font-weight:900;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--ink);padding:4px 9px}
+.ghost{font-family:var(--disp);font-weight:700;font-size:11px;border:2px solid var(--ink);background:var(--paper);padding:5px 10px;cursor:pointer}
+.ghost:hover{background:var(--ink);color:var(--paper)}
+.strike{text-decoration:line-through;text-decoration-thickness:2px;color:var(--muted)}
+
+.spec{margin-top:46px;border:2px solid var(--ink);box-shadow:6px 6px 0 var(--blue);background:var(--paper);padding:26px}
+.spec h3{font-family:var(--disp);font-weight:900;font-size:18px;text-transform:uppercase;letter-spacing:-.01em;margin:0 0 20px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;font-size:13px;color:var(--muted);line-height:1.75}
+.g3 b{display:block;color:var(--ink);font-weight:800;margin-bottom:5px}
+.sw{display:inline-block;width:22px;height:22px;border:2px solid var(--ink);margin:10px 7px 0 0}
+@media(max-width:760px){
+  .summary{flex-direction:column-reverse;gap:13px}
+  .side{flex-direction:row;align-items:center;align-self:flex-start;flex-wrap:wrap}
+  .g3{grid-template-columns:1fr;gap:18px}
+  .filters{display:none}
+}
+</style>
+</head>
+<body>
+<div class="halftone"></div>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="logo">新闻池<small>共享待播 · 3 人协作</small></div>
+    <div class="filters"><span class="f on">全部</span><span class="f">待播</span><span class="f">★ 重点</span></div>
+    <span class="who">阿凯</span>
+  </header>
+
+  <div class="add">
+    <input placeholder="粘贴新闻链接…" />
+    <button class="btn">加入</button>
+  </div>
+
+  <section>
+    <div class="dayhead">
+      <span class="dnum">18</span>
+      <span class="dlbl">十月 · 今天 <span>· 共 3 条</span></span>
+      <span class="spill">顺延未播 →</span>
+    </div>
+
+    <article class="item">
+      <div class="frame">
+        <div class="summary">
+          <div class="smain">
+            <div class="t"><a href="#">国产大模型 Qwen3 发布，官方称推理成本下降 40%</a></div>
+            <div class="meta">机器之心 · <b>小满</b> 添加 · 12 分钟前</div>
+            <div class="note">配图用发布会现场图；基准对比表 <a href="#">https://example.com/qwen3-bench</a></div>
+          </div>
+          <div class="side">
+            <span class="tag">★ 重点</span>
+            <button class="state pending" title="点击标记为已播">待播</button>
+            <button class="ghost">☆</button>
+            <button class="ghost">⋯</button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item done">
+      <div class="frame">
+        <div class="summary">
+          <div class="smain">
+            <div class="t"><a href="#">苹果 M5 芯片跑分曝光，单核提升约 18%</a></div>
+            <div class="meta">IT之家 · <b>阿凯</b> 播出于 09:20</div>
+          </div>
+          <div class="side">
+            <button class="state done" title="点击改回待播">已播</button>
+            <button class="ghost">☆</button>
+            <button class="ghost">⋯</button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="frame">
+        <div class="summary">
+          <div class="smain">
+            <div class="t strike"><a href="#">某大厂裁员传闻（未证实）</a></div>
+            <div class="meta">来源待核实 · <b>老周</b> 添加 · 昨天</div>
+          </div>
+          <div class="side">
+            <button class="state skipped" title="点击恢复待播">略过</button>
+            <button class="ghost">☆</button>
+            <button class="ghost">⋯</button>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section>
+    <div class="dayhead">
+      <span class="dnum">19</span>
+      <span class="dlbl">十月 · 明天 <span>· 共 1 条</span></span>
+      <span class="spill">顺延未播 →</span>
+    </div>
+    <article class="item">
+      <div class="frame">
+        <div class="summary">
+          <div class="smain">
+            <div class="t"><a href="#">欧盟《AI 法案》最终文本审议通过</a></div>
+            <div class="meta">Reuters · <b>老周</b> 添加 · 1 小时前</div>
+            <div class="note">重点讲对开源模型的影响条款，时长控制 3 分钟。</div>
+          </div>
+          <div class="side">
+            <button class="state pending" title="点击标记为已播">待播</button>
+            <button class="ghost">☆</button>
+            <button class="ghost">⋯</button>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="spec">
+    <h3>方案 08 · 双色丝网（Riso Duotone）—— 规格</h3>
+    <div class="g3">
+      <div>
+        <b>配色</b>
+        米灰纸 #F4F1EA + 两个专色：油墨蓝 #1B3A6B、荧光粉 #FF4D6D。
+        全页叠半调网点；标题做"错版"——蓝字下压一层粉的位移副本（模拟丝网套印不准）。
+        <div><span class="sw" style="background:#f4f1ea"></span><span class="sw" style="background:#1b3a6b"></span><span class="sw" style="background:#ff4d6d"></span><span class="sw" style="background:#16181d"></span></div>
+      </div>
+      <div>
+        <b>版面</b>
+        1010px；报头式顶栏 + 超粗窄体大数字（日期），字号对比夸张。条目是 2px 黑框卡片，
+        硬边实心投影（5px 位移），hover 时向左上抬 2px、投影换成专色——像一叠手工印的卡片。
+      </div>
+      <div>
+        <b>按钮</b>
+        硬边方形、2px 描边、实心双色投影。待播=荧光粉、已播=油墨蓝、略过=灰。
+        主按钮粉底，hover 变蓝。全部零圆角、零渐变，手感像盖章。
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

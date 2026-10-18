@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>新闻池 · 方案 10 · 赛博霓虹</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#05060a;--panel:#0b0e16;--panel-2:#0e1220;
+  --cyan:#00f0ff;--magenta:#ff2fb9;--violet:#7b5cff;
+  --ink:#e8f6ff;--ink-2:#9fb4c6;--dim:#5f7185;
+  --line:rgba(0,240,255,.28);--line-2:rgba(0,240,255,.12);
+  --disp:'Orbitron','Rajdhani','Noto Sans SC',sans-serif;
+  --body:'Rajdhani','PingFang SC','Microsoft YaHei',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;font-weight:500;line-height:1.55}
+/* 霓虹地平线网格 + 顶部辉光 */
+.hud{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(120% 70% at 50% -10%,rgba(0,240,255,.16),transparent 60%),
+    radial-gradient(80% 50% at 100% 0%,rgba(255,47,185,.14),transparent 60%);
+}
+.floor{position:fixed;left:0;right:0;bottom:0;height:42vh;pointer-events:none;z-index:0;opacity:.5;
+  background-image:repeating-linear-gradient(90deg,transparent,transparent 39px,var(--line-2) 39px,var(--line-2) 40px),
+                   repeating-linear-gradient(0deg,transparent,transparent 39px,var(--line-2) 39px,var(--line-2) 40px);
+  transform:perspective(300px) rotateX(62deg);transform-origin:bottom center;
+  mask-image:linear-gradient(to top,transparent,black 70%)}
+.wrap{position:relative;z-index:2;max-width:1000px;margin:0 auto;padding:0 26px 90px}
+a{color:inherit;text-decoration:none}
+
+/* ── HUD 顶栏 ── */
+.top{display:flex;align-items:center;gap:18px;padding:36px 0 24px}
+.logo{font-family:var(--disp);font-weight:900;font-size:22px;letter-spacing:.12em;text-transform:uppercase;color:#fff;
+  text-shadow:0 0 8px var(--cyan),2px 0 0 rgba(255,47,185,.8),-2px 0 0 rgba(0,240,255,.8)}
+.status{margin-left:auto;display:flex;align-items:center;gap:8px;font-family:var(--disp);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.who{font-family:var(--disp);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding-left:16px;border-left:1px solid var(--line-2)}
+.who b{color:var(--magenta)}
+
+/* ── 导航条 ── */
+.tabs{display:flex;gap:8px;border-top:1px solid var(--line-2);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:26px}
+.tab{font-family:var(--disp);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:6px 14px;cursor:pointer;border:1px solid transparent}
+.tab:hover{color:var(--cyan);border-color:var(--line-2)}
+.tab.on{color:#02040a;background:var(--cyan);box-shadow:0 0 18px rgba(0,240,255,.55)}
+
+/* ── 输入：切角框 ── */
+.add{display:flex;gap:0;margin-bottom:40px;position:relative;
+  clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));
+  background:linear-gradient(90deg,var(--cyan),var(--magenta));padding:1px}
+.add-in{display:flex;flex:1;background:var(--panel);clip-path:inherit}
+.add input{flex:1;border:0;outline:0;background:transparent;color:var(--ink);font-family:var(--body);font-size:15px;font-weight:600;padding:15px 18px}
+.add input::placeholder{color:var(--dim)}
+.btn{border:0;background:transparent;color:var(--cyan);font-family:var(--disp);font-weight:700;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+  padding:0 26px;cursor:pointer;border-left:1px solid var(--line)}
+.btn:hover{color:#02040a;background:var(--cyan)}
+
+/* ── 分组 ── */
+.dayhead{display:flex;align-items:center;gap:14px;margin:44px 0 18px}
+.dayhead h2{font-family:var(--disp);font-size:clamp(1.4rem,3.4vw,2rem);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin:0;color:#fff;
+  text-shadow:0 0 14px rgba(0,240,255,.4)}
+.dayhead h2 i{font-style:normal;color:var(--magenta);text-shadow:0 0 14px rgba(255,47,185,.6)}
+.dayhead .m{font-family:var(--disp);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.dayhead .m b{color:var(--cyan)}
+.spill{margin-left:auto;font-family:var(--disp);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);
+  border:1px solid var(--line-2);padding:7px 13px;cursor:pointer}
+.spill:hover{color:var(--cyan);border-color:var(--cyan);box-shadow:0 0 16px rgba(0,240,255,.3)}
+
+/* ── 条目：切角面板 + 霓虹边 ── */
+.card{position:relative;background:var(--panel);margin-bottom:14px;padding:20px 22px;
+  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));
+  box-shadow:inset 0 0 0 1px var(--line-2);transition:box-shadow .4s cubic-bezier(.22,1,.36,1),transform .4s cubic-bezier(.22,1,.36,1)}
+.card:hover{transform:translateY(-3px);box-shadow:inset 0 0 0 1px var(--line),inset 0 0 30px rgba(0,240,255,.07),0 0 26px -6px rgba(0,240,255,.28)}
+.card.done{--accent:var(--cyan)}
+.card.pending{--accent:var(--magenta)}
+.card.skipped{opacity:.6}
+.row{display:flex;gap:20px}
+.main{flex:1;min-width:0}
+.t{font-family:var(--body);font-weight:700;font-size:18px;letter-spacing:.005em;line-height:1.38}
+.t:hover{color:var(--cyan);text-shadow:0 0 12px rgba(0,240,255,.5)}
+.meta{font-family:var(--disp);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:7px}
+.meta b{color:var(--ink-2)}
+.note{margin-top:12px;border-left:2px solid var(--magenta);background:var(--panel-2);padding:9px 12px;font-size:13.5px;color:var(--ink-2);
+  clip-path:polygon(0 0,100% 0,100% 100%,8px 100%,0 calc(100% - 8px))}
+.note a{color:var(--cyan);text-decoration:underline;text-underline-offset:2px;word-break:break-all}
+.side{display:flex;flex-direction:column;align-items:flex-end;gap:9px;flex:0 0 auto}
+.state{font-family:var(--disp);font-weight:700;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;background:transparent;
+  border:1px solid var(--accent);color:var(--accent);padding:6px 12px;cursor:pointer;transition:background .35s,color .35s,box-shadow .35s}
+.state:hover{background:var(--accent);color:#02040a;box-shadow:0 0 20px -2px var(--accent)}
+.card.pending .state{--accent:var(--magenta)}
+.tag{font-family:var(--disp);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#02040a;background:var(--magenta);padding:4px 9px;box-shadow:0 0 14px rgba(255,47,185,.5)}
+.ghost{font-family:var(--disp);font-size:10.5px;letter-spacing:.1em;border:1px solid var(--line-2);background:transparent;color:var(--dim);padding:6px 10px;cursor:pointer}
+.ghost:hover{color:var(--cyan);border-color:var(--cyan)}
+
+.spec{margin-top:50px;border:1px solid var(--line-2);padding:26px;
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px))}
+.spec h3{font-family:var(--disp);font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);margin:0 0 20px;text-shadow:0 0 12px rgba(0,240,255,.4)}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;font-size:13.5px;color:var(--ink-2);line-height:1.75}
+.g3 b{display:block;color:#fff;font-family:var(--disp);font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:7px}
+.sw{display:inline-block;width:22px;height:22px;margin:10px 7px 0 0;border:1px solid var(--line-2)}
+@media(max-width:760px){
+  .row{flex-direction:column-reverse;gap:13px}
+  .side{flex-direction:row;align-items:center;align-self:flex-start;flex-wrap:wrap}
+  .g3{grid-template-columns:1fr;gap:20px}
+}
+@media(prefers-reduced-motion:reduce){.dot{animation:none}}
+</style>
+</head>
+<body>
+<div class="hud"></div>
+<div class="floor"></div>
+<div class="wrap">
+
+  <header class="top">
+    <div class="logo">N/POOL</div>
+    <div class="status"><span class="dot"></span>LINK OK · SYNC LIVE</div>
+    <div class="who">OPERATOR <b>阿凯</b></div>
+  </header>
+
+  <nav class="tabs">
+    <span class="tab on">全部</span><span class="tab">待播</span><span class="tab">★ 重点</span><span class="tab">统计</span>
+  </nav>
+
+  <div class="add">
+    <div class="add-in">
+      <input placeholder="paste news url / 粘贴新闻链接…" />
+      <button class="btn">加入</button>
+    </div>
+  </div>
+
+  <div class="dayhead">
+    <h2>10-18 <i>/</i> 今天</h2>
+    <div class="m">共 <b>03</b> · 待播 <b>01</b></div>
+    <div class="spill">SPILL &gt;&gt; 顺延</div>
+  </div>
+
+  <article class="card pending">
+    <div class="row">
+      <div class="main">
+        <div class="t"><a href="#">国产大模型 Qwen3 发布，官方称推理成本下降 40%</a></div>
+        <div class="meta">SRC <b>机器之心</b> · ADD <b>小满</b> · 12 MIN AGO</div>
+        <div class="note">配图用发布会现场图；基准对比表 <a href="#">https://example.com/qwen3-bench</a></div>
+      </div>
+      <div class="side">
+        <span class="tag">★ 重点</span>
+        <button class="state" title="点击标记为已播">待播</button>
+        <button class="ghost">☆</button>
+        <button class="ghost">⋯</button>
+      </div>
+    </div>
+  </article>
+
+  <article class="card done">
+    <div class="row">
+      <div class="main">
+        <div class="t"><a href="#">苹果 M5 芯片跑分曝光，单核提升约 18%</a></div>
+        <div class="meta">SRC <b>IT之家</b> · AIRED BY <b>阿凯</b> @ 09:20</div>
+      </div>
+      <div class="side">
+        <button class="state" title="点击改回待播">已播</button>
+        <button class="ghost">☆</button>
+        <button class="ghost">⋯</button>
+      </div>
+    </div>
+  </article>
+
+  <article class="card skipped">
+    <div class="row">
+      <div class="main">
+        <div class="t"><a href="#">某大厂裁员传闻（未证实）</a></div>
+        <div class="meta">SRC <b>UNVERIFIED</b> · ADD <b>老周</b> · YESTERDAY</div>
+      </div>
+      <div class="side">
+        <button class="state" title="点击恢复待播">略过</button>
+        <button class="ghost">☆</button>
+        <button class="ghost">⋯</button>
+      </div>
+    </div>
+  </article>
+
+  <div class="dayhead">
+    <h2>10-19 <i>/</i> 明天</h2>
+    <div class="m">共 <b>01</b></div>
+    <div class="spill">SPILL &gt;&gt; 顺延</div>
+  </div>
+
+  <article class="card pending">
+    <div class="row">
+      <div class="main">
+        <div class="t"><a href="#">欧盟《AI 法案》最终文本审议通过</a></div>
+        <div class="meta">SRC <b>Reuters</b> · ADD <b>老周</b> · 1H AGO</div>
+        <div class="note">重点讲对开源模型的影响条款，时长控制 3 分钟。</div>
+      </div>
+      <div class="side">
+        <button class="state" title="点击标记为已播">待播</button>
+        <button class="ghost">☆</button>
+        <button class="ghost">⋯</button>
+      </div>
+    </div>
+  </article>
+
+  <section class="spec">
+    <h3>◤ 方案 10 · 赛博霓虹（Cyber Neon）—— 规格</h3>
+    <div class="g3">
+      <div>
+        <b>配色</b>
+        近黑深空 #05060A；霓虹青 #00F0FF 与洋红 #FF2FB9 双色对撞，紫作过渡。
+        顶部辉光 + 底部透视网格地平线。强调色靠发光而非填充。
+        <div><span class="sw" style="background:#05060a"></span><span class="sw" style="background:#00f0ff"></span><span class="sw" style="background:#ff2fb9"></span><span class="sw" style="background:#7b5cff"></span></div>
+      </div>
+      <div>
+        <b>版面</b>
+        1000px；所有面板用 clip-path 切掉两个对角（赛博切角），HUD 状态条 + 大写字母间距导航。
+        Orbitron 做标题/标签（未来感），Rajdhani 做正文（细高、可读）。
+      </div>
+      <div>
+        <b>按钮</b>
+        霓虹描边，hover 反相填充并外发光（box-shadow 扩散）。待播=洋红、已播=青。
+        LOGO 与标题带 glitch 式青/洋红双向色差。仅动 transform/opacity/box-shadow，reduced-motion 停脉冲灯。
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

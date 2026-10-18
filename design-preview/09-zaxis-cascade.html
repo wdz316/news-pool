@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>新闻池 · 方案 09 · 层叠卡片</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --desk:#e6e1d7;--desk-2:#dcd6c9;--surface:#fffefb;
+  --ink:#1a1a1c;--ink-2:#3d3b38;--muted:#87817a;
+  --amber:#c9761d;--blue:#2f5f9e;--green:#3d7a55;--slate:#8b8d93;
+  --sans:'Plus Jakarta Sans','SF Pro Display','PingFang SC','Microsoft YaHei',sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--desk);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;
+  background-image:radial-gradient(circle at 20% 10%,rgba(255,255,255,.6),transparent 40%)}
+.wrap{max-width:960px;margin:0 auto;padding:0 26px 100px}
+a{color:inherit;text-decoration:none}
+
+/* ── 顶栏 ── */
+.top{display:flex;align-items:center;gap:16px;padding:38px 0 30px}
+.mark{font-size:21px;font-weight:800;letter-spacing:-.03em}
+.mark span{color:var(--muted);font-weight:500;font-size:12.5px;margin-left:9px}
+.tabs{margin-left:auto;display:flex;gap:6px}
+.tab{padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted);background:rgba(255,255,255,.5);cursor:pointer;
+  transition:background .4s var(--ease),color .4s var(--ease)}
+.tab:hover{background:#fff}
+.tab.on{background:var(--ink);color:#fff}
+
+/* ── 输入 ── */
+.add{display:flex;align-items:center;gap:10px;background:var(--surface);border-radius:18px;padding:7px 7px 7px 20px;
+  box-shadow:0 1px 2px rgba(0,0,0,.05),0 10px 24px -14px rgba(0,0,0,.35);margin-bottom:58px}
+.add input{flex:1;border:0;outline:0;background:transparent;font-family:var(--sans);font-size:15px;color:var(--ink)}
+.add input::placeholder{color:#b3ada4}
+.btn{border:0;border-radius:14px;background:var(--ink);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;
+  padding:12px 20px;cursor:pointer;transition:transform .4s var(--ease),background .4s var(--ease)}
+.btn:hover{background:#333}.btn:active{transform:scale(.97)}
+
+/* ── 分组 ── */
+.dayhead{display:flex;align-items:baseline;gap:14px;margin:56px 0 26px}
+.dayhead h2{font-size:clamp(1.7rem,4vw,2.5rem);font-weight:800;letter-spacing:-.035em;margin:0;line-height:1}
+.dayhead .m{font-size:13px;color:var(--muted);font-weight:600}
+.dayhead .m b{color:var(--ink)}
+.dayhead .spill{margin-left:auto;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.55)}
+.dayhead .spill:hover{background:#fff;color:var(--ink)}
+
+/* ── Z 轴层叠：卡片轻微旋转、互相叠压、多层投影 ── */
+.stack{position:relative;padding-left:6px}
+.card{position:relative;background:var(--surface);border-radius:16px;padding:22px 24px 22px 30px;margin-bottom:-6px;
+  box-shadow:0 1px 1px rgba(0,0,0,.06),0 14px 30px -16px rgba(0,0,0,.4),0 30px 60px -30px rgba(0,0,0,.3);
+  transition:transform .5s var(--ease),box-shadow .5s var(--ease),margin .5s var(--ease)}
+/* 每张卡片的色脊（左边缘的实体色条） */
+.card:before{content:'';position:absolute;left:0;top:14px;bottom:14px;width:6px;border-radius:0 4px 4px 0;background:var(--slate)}
+.card.pending:before{background:var(--amber)}
+.card.done:before{background:var(--green)}
+.card.skipped:before{background:var(--slate)}
+.card:nth-child(odd){transform:rotate(-.7deg)}
+.card:nth-child(even){transform:rotate(.55deg)}
+.card:hover{transform:rotate(0) translateY(-6px) scale(1.012);margin-bottom:6px;z-index:5;
+  box-shadow:0 2px 3px rgba(0,0,0,.06),0 26px 50px -18px rgba(0,0,0,.45),0 50px 90px -40px rgba(0,0,0,.35)}
+.row{display:flex;gap:20px}
+.main{flex:1;min-width:0}
+.title{font-size:17.5px;font-weight:700;letter-spacing:-.02em;line-height:1.4}
+.title:hover{color:#000}
+.meta{font-size:12.5px;color:var(--muted);margin-top:8px;font-weight:500}
+.meta b{color:var(--ink-2);font-weight:700}
+.note{margin-top:14px;background:var(--desk-2);border-radius:11px;padding:12px 14px;font-size:13.5px;color:var(--ink-2)}
+.note a{color:var(--blue);text-decoration:underline;text-underline-offset:2px;word-break:break-all;font-weight:600}
+.side{display:flex;flex-direction:column;align-items:flex-end;gap:9px;flex:0 0 auto}
+.state{border:0;border-radius:999px;font-family:var(--sans);font-size:11.5px;font-weight:800;letter-spacing:.03em;padding:6px 14px;cursor:pointer;
+  transition:transform .4s var(--ease),filter .3s}
+.state:hover{filter:brightness(.95)}.state:hover{transform:translateY(-1px)}
+.state.pending{background:rgba(201,118,29,.13);color:var(--amber)}
+.state.done{background:rgba(61,122,85,.13);color:var(--green)}
+.state.skipped{background:rgba(0,0,0,.05);color:var(--muted)}
+.tag{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--amber);border-radius:999px;padding:5px 11px}
+.ghost{border:0;border-radius:999px;background:rgba(0,0,0,.05);font-family:var(--sans);font-size:11.5px;font-weight:700;color:var(--muted);padding:6px 13px;cursor:pointer;
+  transition:background .4s var(--ease),color .4s var(--ease)}
+.ghost:hover{background:var(--ink);color:#fff}
+.done .title{color:var(--muted)}
+.skipped .title{color:var(--muted);text-decoration:line-through}
+
+.spec{margin-top:70px;background:var(--surface);border-radius:20px;padding:30px;
+  box-shadow:0 1px 2px rgba(0,0,0,.05),0 20px 44px -24px rgba(0,0,0,.35)}
+.spec h3{font-size:18px;font-weight:800;letter-spacing:-.02em;margin:0 0 20px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;font-size:13px;color:var(--muted);line-height:1.75}
+.g3 b{display:block;color:var(--ink);font-weight:800;margin-bottom:5px}
+.sw{display:inline-block;width:22px;height:22px;border-radius:7px;margin:10px 7px 0 0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.07)}
+@media(max-width:760px){
+  .card{transform:none!important}
+  .row{flex-direction:column-reverse;gap:12px}
+  .side{flex-direction:row;align-items:center;align-self:flex-start;flex-wrap:wrap}
+  .g3{grid-template-columns:1fr;gap:20px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="mark">新闻池<span>共享待播 · 3 人协作</span></div>
+    <div class="tabs"><span class="tab on">全部</span><span class="tab">待播</span><span class="tab">★ 重点</span><span class="tab">统计</span></div>
+  </header>
+
+  <div class="add">
+    <input placeholder="粘贴新闻链接，回车加入待播池…" />
+    <button class="btn">加入</button>
+  </div>
+
+  <div class="dayhead">
+    <h2>10 月 18 日</h2>
+    <div class="m">今天 · 共 <b>3</b> 条</div>
+    <div class="spill">顺延未播 →</div>
+  </div>
+
+  <div class="stack">
+    <article class="card pending">
+      <div class="row">
+        <div class="main">
+          <div class="title"><a href="#">国产大模型 Qwen3 发布，官方称推理成本下降 40%</a></div>
+          <div class="meta">机器之心 · <b>小满</b> 添加 · 12 分钟前</div>
+          <div class="note">配图用发布会现场图；基准对比表 <a href="#">https://example.com/qwen3-bench</a></div>
+        </div>
+        <div class="side">
+          <span class="tag">★ 重点</span>
+          <button class="state pending" title="点击标记为已播">待播</button>
+          <button class="ghost">☆ 重点</button>
+          <button class="ghost">⋯</button>
+        </div>
+      </div>
+    </article>
+
+    <article class="card done">
+      <div class="row">
+        <div class="main">
+          <div class="title"><a href="#">苹果 M5 芯片跑分曝光，单核提升约 18%</a></div>
+          <div class="meta">IT之家 · <b>阿凯</b> 播出于 09:20</div>
+        </div>
+        <div class="side">
+          <button class="state done" title="点击改回待播">已播</button>
+          <button class="ghost">☆ 重点</button>
+          <button class="ghost">⋯</button>
+        </div>
+      </div>
+    </article>
+
+    <article class="card skipped">
+      <div class="row">
+        <div class="main">
+          <div class="title"><a href="#">某大厂裁员传闻（未证实）</a></div>
+          <div class="meta">来源待核实 · <b>老周</b> 添加 · 昨天</div>
+        </div>
+        <div class="side">
+          <button class="state skipped" title="点击恢复待播">略过</button>
+          <button class="ghost">☆ 重点</button>
+          <button class="ghost">⋯</button>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <div class="dayhead">
+    <h2>10 月 19 日</h2>
+    <div class="m">明天 · 共 <b>1</b> 条</div>
+    <div class="spill">顺延未播 →</div>
+  </div>
+
+  <div class="stack">
+    <article class="card pending">
+      <div class="row">
+        <div class="main">
+          <div class="title"><a href="#">欧盟《AI 法案》最终文本审议通过</a></div>
+          <div class="meta">Reuters · <b>老周</b> 添加 · 1 小时前</div>
+          <div class="note">重点讲对开源模型的影响条款，时长控制 3 分钟。</div>
+        </div>
+        <div class="side">
+          <button class="state pending" title="点击标记为已播">待播</button>
+          <button class="ghost">☆ 重点</button>
+          <button class="ghost">⋯</button>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <section class="spec">
+    <h3>方案 09 · 层叠卡片（Z-Axis Cascade）—— 规格</h3>
+    <div class="g3">
+      <div>
+        <b>配色</b>
+        暖灰"桌面" #E6E1D7 + 象牙白卡片 #FFFEFB；状态用左缘实体色脊编码——
+        琥珀（待播）、森绿（已播）、石板灰（略过），正文近黑，次要信息暖灰。
+        <div><span class="sw" style="background:#e6e1d7"></span><span class="sw" style="background:#fffefb"></span><span class="sw" style="background:#c9761d"></span><span class="sw" style="background:#3d7a55"></span></div>
+      </div>
+      <div>
+        <b>版面</b>
+        960px；条目像桌上随手码的一摞实体卡：每张轻微旋转（奇 -.7° / 偶 +.55°）、
+        上下叠压 6px，三层投影造出真实景深。hover 时"啪"地摆正并抬离桌面（旋转归零 + 上移 6px + 放大 1.2%）。
+      </div>
+      <div>
+        <b>按钮</b>
+        全圆角胶囊。主按钮近黑，状态是浅底同色字的软胶囊，hover 微抬 1px；
+        左侧 6px 色脊是状态的主视觉表达，胶囊只是补充。只动 transform/opacity/box-shadow。
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

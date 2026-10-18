@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>新闻池 · 方案 02 · 暗夜玻璃</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#050505;--panel:rgba(255,255,255,.035);--hair:rgba(255,255,255,.10);
+  --ink:#f4f4f5;--ink-2:#b8b8bd;--muted:#7d7d85;
+  --amber:#f2b45c;--amber-dim:rgba(242,180,92,.16);
+  --green:#6fd39a;--green-dim:rgba(111,211,154,.14);
+  --grey:#8a8a91;--grey-dim:rgba(255,255,255,.06);
+  --sans:'Space Grotesk','SF Pro Display','PingFang SC','Microsoft YaHei',sans-serif;
+  --ease:cubic-bezier(.32,.72,0,1);
+}
+*{box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;overflow-x:hidden}
+/* 背景：极暗 OLED + 两团缓慢呼吸的径向光斑（fixed, pointer-events:none） */
+.glow{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+   radial-gradient(560px 400px at 18% -6%, rgba(120,90,255,.20), transparent 62%),
+   radial-gradient(620px 460px at 88% 12%, rgba(40,190,150,.14), transparent 64%);
+  animation:breathe 22s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.035;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='120' height='120' filter='url(%23n)'/></svg>")}
+.wrap{position:relative;z-index:2;max-width:960px;margin:0 auto;padding:0 24px 80px}
+a{color:inherit;text-decoration:none}
+
+/* ── 悬浮玻璃胶囊导航（脱离顶部，mt-6, w-max, rounded-full） ── */
+.nav{position:sticky;top:20px;z-index:20;margin:24px auto 40px;width:max-content;max-width:100%;
+  display:flex;align-items:center;gap:6px;padding:8px;
+  background:rgba(12,12,14,.72);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid var(--hair);border-radius:999px;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+.nav .mark{font-weight:700;font-size:14px;letter-spacing:-.01em;padding:0 12px 0 8px}
+.nav .mark i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--amber);margin-right:8px;vertical-align:middle;box-shadow:0 0 12px var(--amber)}
+.nav a{padding:7px 14px;border-radius:999px;font-size:13.5px;color:var(--ink-2);
+  transition:background .5s var(--ease),color .5s var(--ease)}
+.nav a:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav a.on{background:rgba(255,255,255,.12);color:#fff}
+.nav .who{margin-left:6px;display:flex;align-items:center;gap:8px;padding:0 6px 0 12px;border-left:1px solid var(--hair)}
+.nav .who span{font-size:12.5px;color:var(--muted)}
+.av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:600;
+  background:linear-gradient(145deg,rgba(255,255,255,.22),rgba(255,255,255,.06));border:1px solid var(--hair)}
+
+/* ── 输入行：Double-Bezel 外壳 ── */
+.bezel{background:rgba(255,255,255,.045);border:1px solid var(--hair);border-radius:26px;padding:7px;
+  transition:border-color .6s var(--ease)}
+.bezel:focus-within{border-color:rgba(255,255,255,.26)}
+.bezel-in{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.45);border-radius:20px;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.08);padding:6px 6px 6px 20px}
+.bezel-in input{flex:1;border:0;outline:0;background:transparent;color:var(--ink);font-family:var(--sans);font-size:15px}
+.bezel-in input::placeholder{color:#5f5f66}
+.btn{border:0;border-radius:999px;padding:11px 20px;font-family:var(--sans);font-size:14px;font-weight:600;
+  background:#fff;color:#0a0a0a;cursor:pointer;display:inline-flex;align-items:center;gap:10px;
+  transition:transform .5s var(--ease),background .4s var(--ease)}
+.btn:hover{background:#e9e9ec}
+.btn:active{transform:scale(.97)}
+/* Button-in-Button：尾部图标嵌在独立圆壳里 */
+.btn .ico{width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.10);display:grid;place-items:center;
+  transition:transform .5s var(--ease)}
+.btn:hover .ico{transform:translate(3px,-2px) scale(1.06)}
+
+/* ── 分组标题 ── */
+.dayhead{display:flex;align-items:flex-end;gap:16px;margin:44px 0 18px}
+.dayhead h2{font-size:30px;font-weight:600;letter-spacing:-.03em;margin:0;line-height:1}
+.dayhead .sub{font-size:12.5px;color:var(--muted);padding-bottom:3px}
+.dayhead .sub b{color:var(--amber);font-weight:600}
+.dayhead .spill{margin-left:auto;font-size:12.5px;color:var(--muted);cursor:pointer;transition:color .4s var(--ease)}
+.dayhead .spill:hover{color:#fff}
+
+/* ── 卡片：Vantablack + 发丝高光 Double-Bezel ── */
+.card{background:var(--panel);border:1px solid var(--hair);border-radius:24px;padding:9px;margin-bottom:14px;
+  transition:border-color .6s var(--ease),transform .6s var(--ease)}
+.card:hover{border-color:rgba(255,255,255,.22);transform:translateY(-2px)}
+.core{background:rgba(0,0,0,.38);border-radius:16px;box-shadow:inset 0 1px 1px rgba(255,255,255,.06);padding:20px 22px;
+  display:flex;gap:20px}
+.cmain{flex:1;min-width:0}
+.ctitle{font-size:17px;font-weight:600;letter-spacing:-.01em;line-height:1.45}
+.ctitle:hover{color:#fff;text-shadow:0 0 24px rgba(255,255,255,.35)}
+.cmeta{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:9px;font-size:12.5px;color:var(--muted)}
+.cmeta .src{color:var(--ink-2)}
+.cnote{margin-top:14px;background:rgba(255,255,255,.04);border:1px solid var(--hair);border-radius:12px;
+  padding:12px 14px;font-size:13.5px;color:var(--ink-2);line-height:1.65}
+.cnote a{color:var(--amber);text-decoration:underline;text-underline-offset:2px;word-break:break-all}
+.cnote a:hover{color:#fff}
+
+.cside{display:flex;flex-direction:column;align-items:flex-end;gap:9px;flex:0 0 auto}
+
+/* ── 状态胶囊：发光描边 pill ── */
+.pill{border:1px solid transparent;border-radius:999px;padding:6px 14px;font-family:var(--sans);font-size:11.5px;
+  font-weight:600;letter-spacing:.04em;cursor:pointer;transition:transform .4s var(--ease),filter .3s}
+.pill:hover{filter:brightness(1.15)}
+.pill:active{transform:scale(.96)}
+.pill.pending{background:var(--amber-dim);color:var(--amber);border-color:rgba(242,180,92,.4)}
+.pill.done{background:var(--green-dim);color:var(--green);border-color:rgba(111,211,154,.36)}
+.pill.skipped{background:var(--grey-dim);color:var(--grey);border-color:var(--hair)}
+.tag{font-size:11px;letter-spacing:.05em;color:var(--amber);background:var(--amber-dim);
+  border:1px solid rgba(242,180,92,.34);border-radius:999px;padding:4px 11px;font-weight:600}
+.ghost{background:rgba(255,255,255,.05);border:1px solid var(--hair);border-radius:999px;padding:6px 13px;
+  font-family:var(--sans);font-size:12.5px;color:var(--ink-2);cursor:pointer;transition:background .4s var(--ease),color .4s var(--ease)}
+.ghost:hover{background:rgba(255,255,255,.13);color:#fff}
+
+/* ── 规格 ── */
+.spec{margin-top:64px;border-top:1px solid var(--hair);padding-top:32px}
+.spec h3{font-size:18px;font-weight:600;margin:0 0 16px;letter-spacing:-.01em}
+.spec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;font-size:13px;color:var(--muted);line-height:1.7}
+.spec-grid b{display:block;color:var(--ink);margin-bottom:5px;font-weight:600}
+.swatches{display:flex;gap:6px;margin-top:9px}
+.sw{width:22px;height:22px;border-radius:6px;border:1px solid var(--hair)}
+@media(max-width:740px){
+  .core{flex-direction:column-reverse;gap:14px}
+  .cside{flex-direction:row;align-items:center;align-self:flex-start}
+  .nav{gap:2px}.nav a{padding:7px 10px}.nav .who span{display:none}
+  .spec-grid{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){.glow{animation:none}}
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<div class="grain"></div>
+
+<div class="wrap">
+  <nav class="nav">
+    <span class="mark"><i></i>新闻池</span>
+    <a href="#" class="on">全部</a>
+    <a href="#">待播</a>
+    <a href="#">★ 重点</a>
+    <a href="#">统计</a>
+    <span class="who"><span>阿凯</span><span class="av">凯</span></span>
+  </nav>
+
+  <div class="bezel">
+    <div class="bezel-in">
+      <input placeholder="粘贴新闻链接，回车加入待播池…" />
+      <button class="btn">加入<span class="ico">↗</span></button>
+    </div>
+  </div>
+
+  <div class="dayhead">
+    <h2>10 月 18 日</h2>
+    <div class="sub">今天 · 共 <b>3</b> 条 · 待播 1</div>
+    <div class="spill">未播出的顺延 →</div>
+  </div>
+
+  <article class="card">
+    <div class="core">
+      <div class="cmain">
+        <div class="ctitle"><a href="#">国产大模型 Qwen3 发布，官方称推理成本下降 40%</a></div>
+        <div class="cmeta"><span class="src">机器之心</span><span>·</span><span>小满 添加 · 12 分钟前</span></div>
+        <div class="cnote">配图用发布会现场图；基准对比表在这里 <a href="#">https://example.com/qwen3-bench</a></div>
+      </div>
+      <div class="cside">
+        <span class="tag">★ 重点</span>
+        <button class="pill pending" title="点击标记为已播">待播</button>
+        <button class="ghost">☆</button>
+        <button class="ghost">⋯</button>
+      </div>
+    </div>
+  </article>
+
+  <article class="card">
+    <div class="core">
+      <div class="cmain">
+        <div class="ctitle"><a href="#">苹果 M5 芯片跑分曝光，单核提升约 18%</a></div>
+        <div class="cmeta"><span class="src">IT之家</span><span>·</span><span>阿凯 播出于 09:20</span></div>
+      </div>
+      <div class="cside">
+        <button class="pill done" title="点击改回待播">已播</button>
+        <button class="ghost">☆</button>
+        <button class="ghost">⋯</button>
+      </div>
+    </div>
+  </article>
+
+  <article class="card">
+    <div class="core">
+      <div class="cmain">
+        <div class="ctitle" style="color:var(--muted)"><a href="#">某大厂裁员传闻（未证实）</a></div>
+        <div class="cmeta"><span class="src">来源待核实</span><span>·</span><span>老周 添加 · 昨天</span></div>
+      </div>
+      <div class="cside">
+        <button class="pill skipped" title="点击恢复待播">略过</button>
+        <button class="ghost">☆</button>
+        <button class="ghost">⋯</button>
+      </div>
+    </div>
+  </article>
+
+  <div class="dayhead">
+    <h2>10 月 19 日</h2>
+    <div class="sub">明天 · 共 <b>1</b> 条</div>
+    <div class="spill">未播出的顺延 →</div>
+  </div>
+
+  <article class="card">
+    <div class="core">
+      <div class="cmain">
+        <div class="ctitle"><a href="#">欧盟《AI 法案》最终文本审议通过</a></div>
+        <div class="cmeta"><span class="src">Reuters</span><span>·</span><span>老周 添加 · 1 小时前</span></div>
+        <div class="cnote">重点讲对开源模型的影响条款，时长控制 3 分钟。</div>
+      </div>
+      <div class="cside">
+        <button class="pill pending" title="点击标记为已播">待播</button>
+        <button class="ghost">☆</button>
+        <button class="ghost">⋯</button>
+      </div>
+    </div>
+  </article>
+
+  <section class="spec">
+    <h3>方案 02 · 暗夜玻璃（OLED Glass）—— 规格</h3>
+    <div class="spec-grid">
+      <div>
+        <b>配色</b>
+        纯黑 OLED #050505 画布，两张缓慢呼吸的径向光斑（紫 / 翡翠，低透明）；
+        卡片近黑 + 发丝高光；强调色仅琥珀 #F2B45C 与薄荷绿 #6FD39A 两种，用于状态与链接。
+        <div class="swatches">
+          <span class="sw" style="background:#050505"></span><span class="sw" style="background:#1a1a1d"></span>
+          <span class="sw" style="background:#f2b45c"></span><span class="sw" style="background:#6fd39a"></span>
+          <span class="sw" style="background:#fff"></span>
+        </div>
+      </div>
+      <div>
+        <b>版面</b>
+        960px 居中；顶栏是脱离顶部的悬浮玻璃胶囊（backdrop-blur 24px）；
+        所有卡片用 Double-Bezel 双层结构（外壳 + 内芯，圆角同心递减）。
+        大留白、大圆角 24px、字号对比强（30px 日期 / 17px 标题）。
+      </div>
+      <div>
+        <b>按钮</b>
+        主按钮：全圆角白色 pill，尾部图标嵌在独立圆壳里（Button-in-Button），hover 时圆壳斜向位移。
+        状态胶囊：半透明发光描边 pill。全部动效走自定义 cubic-bezier(.32,.72,0,1)，仅动 transform/opacity。
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>

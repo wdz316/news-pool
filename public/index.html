@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>共享新闻池</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 登录 -->
+<div id="login-view" class="view">
+  <div class="login-card">
+    <h1 id="login-brand">共享新闻池</h1>
+    <p class="sub">多人协作 · 避免撞新闻</p>
+    <form id="login-form">
+      <label>账号
+        <input id="login-username" autocomplete="username" required>
+      </label>
+      <label>密码
+        <input id="login-password" type="password" autocomplete="current-password" required>
+      </label>
+      <button type="submit" class="primary">登录</button>
+      <div id="login-error" class="error"></div>
+    </form>
+    <p class="hint">测试账号：alice / bob / carol，密码 123456</p>
+  </div>
+</div>
+
+<!-- 主界面 -->
+<div id="app-view" class="view hidden">
+  <header class="topbar">
+    <div class="brand"><span id="brand-name" class="brand-name">共享新闻池</span> <span id="pool-name" class="pool-name"></span></div>
+    <div class="topbar-right">
+      <span id="conn" class="conn" title="连接状态"><i></i><span id="conn-text">连接中</span></span>
+      <span id="online" class="online"></span>
+      <span id="me" class="me"></span>
+      <button id="btn-stats" class="ghost">统计</button>
+      <button id="btn-theme" class="ghost">外观</button>
+      <button id="btn-members" class="ghost">成员模式</button>
+      <button id="btn-logout" class="ghost">退出</button>
+    </div>
+  </header>
+
+  <section class="toolbar">
+    <input id="add-url" class="grow" placeholder="粘贴新闻链接后按回车；也可把链接/文字拖到页面任意位置，或在页面空白处 Ctrl+V 粘贴">
+    <input id="add-title" class="grow" placeholder="标题/消息内容（可选，留空自动抓取；社交媒体建议手动填内容）">
+    <input id="add-note" class="add-note" placeholder="备注（可选）：背景介绍 / 你的评价 / 播出时想说的话">
+    <input id="add-date" type="date" title="计划播出日期">
+    <button id="btn-add" class="primary">加入池</button>
+  </section>
+
+  <p class="toolbar-hint">从社交媒体收到消息？把链接或文字丢进来 → 系统自动搜索其他来源帮你核对真伪。</p>
+
+  <nav id="filters" class="filters">
+    <button class="filter active" data-filter="all">全部 <span class="fcount"></span></button>
+    <button class="filter" data-filter="pending">待播 <span class="fcount"></span></button>
+    <button class="filter" data-filter="done">已播 <span class="fcount"></span></button>
+    <button class="filter" data-filter="flagged">★ 重点 <span class="fcount"></span></button>
+    <button class="filter" data-filter="skipped">略过 <span class="fcount"></span></button>
+  </nav>
+
+  <main id="list" class="list"></main>
+</div>
+
+<!-- 重复警告弹窗 -->
+<div id="dup-modal" class="modal hidden">
+  <div class="modal-card dup-card">
+    <h2 id="dup-heading">⚠️ 发现疑似重复</h2>
+    <p class="dup-sub">下面这些新闻可能已经有人在播了。<b>提交</b>＝标为重点关注并提醒所有成员；<b>忽略</b>＝仅关闭。</p>
+    <ul id="dup-list" class="dup-list"></ul>
+    <div class="modal-actions">
+      <button id="dup-ignore" class="ghost">忽略</button>
+      <button id="dup-submit" class="primary">提交</button>
+    </div>
+  </div>
+</div>
+
+<!-- 成员模式弹窗 -->
+<div id="members-modal" class="modal hidden">
+  <div class="modal-card">
+    <h2>成员模式</h2>
+
+    <div id="unlock-box">
+      <p class="modal-desc">请输入管理密码进入成员模式（可增删成员）</p>
+      <input id="unlock-pw" type="password" placeholder="管理密码">
+      <div id="unlock-error" class="error"></div>
+      <div class="modal-actions">
+        <button id="btn-unlock" class="primary">进入</button>
+      </div>
+    </div>
+
+    <div id="members-box" class="hidden">
+      <div class="member-section">
+        <label class="field-label">界面名称（左上角，改完所有人实时同步）</label>
+        <div class="inline-row">
+          <input id="brand-input" placeholder="大标题，如：我的新闻台">
+          <input id="pool-name-input" placeholder="副标题，如：今日待播">
+          <button id="btn-save-poolname" class="primary">保存</button>
+        </div>
+        <p class="field-hint">左边＝大标题，右边＝「· 副标题」。</p>
+      </div>
+
+      <div class="member-section">
+        <label class="field-label">成员（可改显示名 / 删除）</label>
+        <ul id="member-list" class="member-list"></ul>
+      </div>
+
+      <div class="member-section">
+        <label class="field-label">添加成员</label>
+        <div class="member-add">
+          <input id="m-user" placeholder="账号">
+          <input id="m-name" placeholder="显示名">
+          <input id="m-pw" type="password" placeholder="密码">
+          <select id="m-role">
+            <option value="member">普通成员</option>
+            <option value="admin">管理员</option>
+          </select>
+          <button id="btn-add-member" class="primary">添加成员</button>
+        </div>
+        <div id="member-error" class="error"></div>
+      </div>
+
+      <div class="danger-zone">
+        <div class="danger-title">测试工具</div>
+        <p class="danger-desc">清空本池的全部新闻记录（不可撤销，用于测试阶段重置）。</p>
+        <button id="btn-clear-items" class="danger-btn">🗑 清空本池所有记录</button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button id="members-close" class="ghost">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 移动日期弹窗（单条 / 批量共用） -->
+<div id="move-modal" class="modal hidden">
+  <div class="modal-card">
+    <h2 id="move-title">移动到其他日期</h2>
+    <p class="modal-desc" id="move-desc"></p>
+    <input id="move-date" type="date">
+    <div id="move-error" class="error"></div>
+    <div class="modal-actions">
+      <button id="move-cancel" class="ghost">取消</button>
+      <button id="move-confirm" class="primary">确定移动</button>
+    </div>
+  </div>
+</div>
+
+<!-- 导出当天清单弹窗 -->
+<div id="export-modal" class="modal hidden">
+  <div class="modal-card">
+    <h2 id="export-title">导出当天清单</h2>
+    <p class="modal-desc">可复制到剪贴板，或下载为 .txt 文件。</p>
+    <textarea id="export-text" class="export-text" rows="14" readonly></textarea>
+    <div class="modal-actions">
+      <button id="export-close" class="ghost">关闭</button>
+      <button id="export-copy" class="ghost">复制</button>
+      <button id="export-download" class="primary">下载 .txt</button>
+    </div>
+  </div>
+</div>
+
+<!-- 播出统计弹窗 -->
+<div id="stats-modal" class="modal hidden">
+  <div class="modal-card stats-card">
+    <h2>播出统计</h2>
+    <div class="stats-nav">
+      <button id="stats-prev" class="mini edit">‹ 上月</button>
+      <span id="stats-month" class="stats-month"></span>
+      <button id="stats-next" class="mini edit">下月 ›</button>
+      <button id="stats-today" class="mini skip">回到本月</button>
+    </div>
+    <p class="field-hint">每格显示某人「准备/已播」条数：准备＝他添加的，已播＝他标记播出的。数字格式 <b>准备/已播</b>。点击有新闻的某天，可直接跳到列表里那一天。</p>
+    <div id="stats-grid" class="stats-grid"></div>
+    <div id="stats-summary" class="stats-summary"></div>
+    <div class="modal-actions">
+      <button id="stats-close" class="ghost">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 备注弹窗（添加时可写，之后也能改） -->
+<div id="note-modal" class="modal hidden">
+  <div class="modal-card">
+    <h2>备注</h2>
+    <p class="modal-desc" id="note-desc"></p>
+    <textarea id="note-text" class="note-text" rows="7" placeholder="例如：这位嘉宾是谁、背景是什么、我自己的评价、播出时想说的话…"></textarea>
+    <div id="note-error" class="error"></div>
+    <div class="modal-actions">
+      <button id="note-cancel" class="ghost">取消</button>
+      <button id="note-save" class="primary">保存备注</button>
+    </div>
+  </div>
+</div>
+
+<!-- 外观设置弹窗 -->
+<div id="theme-modal" class="modal hidden">
+  <div class="modal-card">
+    <h2>外观设置</h2>
+    <p class="modal-desc">挑一套喜欢的界面风格。只影响你自己的浏览器，别人不受影响，点一下立即生效并记住。</p>
+    <p class="theme-current">当前：<b id="theme-current-name">经典 · 暖灰</b></p>
+    <div id="theme-grid" class="theme-grid"></div>
+    <div class="modal-actions">
+      <button id="theme-close" class="ghost">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div id="drag-overlay" class="drag-overlay hidden">松手即可加入新闻池</div>
+<div id="toast" class="toast hidden"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

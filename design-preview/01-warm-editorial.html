@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>新闻池 · 方案 01 · 暖调编辑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --canvas:#f7f6f3;--surface:#fff;--surface-2:#fbfbfa;
+  --line:#eaeaea;--ink:#111;--ink-2:#2f3437;--muted:#787774;
+  --amber-bg:#fbf3db;--amber-fg:#956400;
+  --green-bg:#edf3ec;--green-fg:#346538;
+  --blue-bg:#e1f3fe;--blue-fg:#1f6c9f;
+  --grey-bg:#f1f0ee;--grey-fg:#6b6a67;
+  --serif:'Newsreader','Noto Serif SC','Songti SC',SimSun,serif;
+  --sans:'SF Pro Display','Geist Sans','Helvetica Neue','PingFang SC','Microsoft YaHei',sans-serif;
+  --mono:'Geist Mono','SF Mono',Consolas,monospace;
+  --r:10px;
+}
+*{box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--canvas);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:940px;margin:0 auto;padding:0 24px}
+
+/* ── 顶栏：无 bar chrome，只有字标 + 少量链接 + 一个动作 ── */
+.top{display:flex;align-items:center;gap:20px;padding:30px 0 22px}
+.brand{font-family:var(--serif);font-size:22px;font-weight:600;letter-spacing:-.02em}
+.brand small{font-family:var(--sans);font-size:12px;color:var(--muted);font-weight:400;margin-left:10px;letter-spacing:0}
+.member{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.avatar{width:26px;height:26px;border-radius:50%;background:#111;color:#fff;display:grid;place-items:center;font-size:11px;font-weight:600}
+.tabs{display:flex;gap:4px;padding:0 0 18px}
+.tab{padding:6px 13px;border-radius:999px;font-size:13px;color:var(--muted);cursor:pointer}
+.tab.on{background:#111;color:#fff}
+.tab .n{opacity:.55;margin-left:5px;font-variant-numeric:tabular-nums}
+
+/* ── 输入行 ── */
+.add{display:flex;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:6px 6px 6px 16px;margin-bottom:40px}
+.add input{flex:1;border:0;outline:0;background:transparent;font-family:var(--sans);font-size:15px;color:var(--ink)}
+.add input::placeholder{color:#a8a7a4}
+.btn{background:#111;color:#fff;border:0;border-radius:6px;padding:11px 20px;font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer;transition:background .2s,transform .12s}
+.btn:hover{background:#333}
+.btn:active{transform:scale(.98)}
+
+/* ── 日期分组 ── */
+.day{margin-bottom:52px}
+.day-head{display:flex;align-items:baseline;gap:14px;margin-bottom:14px}
+.day-title{font-family:var(--serif);font-size:26px;font-weight:600;letter-spacing:-.02em}
+.day-meta{font-size:12px;color:var(--muted);letter-spacing:.02em}
+.day-meta b{font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.spill{margin-left:auto;font-size:12.5px;color:var(--muted);cursor:pointer;border-bottom:1px solid var(--line);padding-bottom:1px}
+.spill:hover{color:var(--ink);border-color:#111}
+
+/* ── 条目卡：bento，边界靠 1px 线，不用阴影 ── */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px;display:flex;gap:20px;margin-bottom:12px}
+.card-main{flex:1;min-width:0}
+.card-title{font-size:16.5px;font-weight:600;line-height:1.45;letter-spacing:-.01em}
+.card-title:hover{color:var(--blue-fg)}
+.meta{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:9px;font-size:12.5px;color:var(--muted)}
+.meta .src{color:var(--ink-2)}
+.note{margin-top:14px;padding:12px 14px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;font-size:13.5px;color:var(--ink-2);line-height:1.65}
+.note a{color:var(--blue-fg);text-decoration:underline;text-underline-offset:2px;word-break:break-all}
+.note a:hover{color:var(--ink)}
+
+.card-side{display:flex;flex-direction:column;align-items:flex-end;gap:10px;flex:0 0 auto}
+
+/* ── 状态胶囊（可点）：desaturated pastel pill ── */
+.pill{border:0;border-radius:999px;padding:5px 13px;font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.06em;cursor:pointer;transition:filter .18s,transform .12s}
+.pill:hover{filter:brightness(.96)}
+.pill:active{transform:scale(.97)}
+.pill.pending{background:var(--amber-bg);color:var(--amber-fg)}
+.pill.done{background:var(--green-bg);color:var(--green-fg)}
+.pill.skipped{background:var(--grey-bg);color:var(--grey-fg)}
+
+/* ── 次要按钮 ── */
+.ghost{border:1px solid var(--line);background:transparent;border-radius:6px;padding:5px 11px;font-family:var(--sans);font-size:12.5px;color:var(--muted);cursor:pointer;transition:border-color .18s,color .18s}
+.ghost:hover{border-color:#111;color:var(--ink)}
+.ghost.on{border-color:#111;color:var(--ink);background:#fff}
+
+.badge-star{align-self:flex-start;font-size:11px;letter-spacing:.06em;color:var(--amber-fg);background:var(--amber-bg);border-radius:999px;padding:4px 10px;font-weight:600}
+
+/* ── 规格说明条 ── */
+.spec{border-top:1px solid var(--line);margin-top:8px;padding:34px 0 60px}
+.spec h3{font-family:var(--serif);font-size:19px;font-weight:600;margin:0 0 14px}
+.spec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;font-size:13px;color:var(--muted);line-height:1.7}
+.spec-grid b{display:block;color:var(--ink);font-size:13px;margin-bottom:4px;font-weight:600}
+.swatches{display:flex;gap:6px;margin-top:8px}
+.sw{width:22px;height:22px;border-radius:5px;border:1px solid var(--line)}
+@media(max-width:720px){
+  .card{flex-direction:column-reverse;gap:14px}
+  .card-side{flex-direction:row;align-items:center;align-self:flex-start}
+  .spec-grid{grid-template-columns:1fr}
+  .add{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">新闻池<small>共享待播 · 3 人协作</small></div>
+    <div class="member"><span class="avatar">凯</span>阿凯 · 管理员</div>
+  </header>
+
+  <nav class="tabs">
+    <span class="tab on">全部<span class="n">4</span></span>
+    <span class="tab">待播<span class="n">2</span></span>
+    <span class="tab">★ 重点<span class="n">1</span></span>
+    <span class="tab">今天<span class="n">3</span></span>
+    <span class="tab" style="margin-left:auto;border:1px solid var(--line)">统计</span>
+  </nav>
+
+  <div class="add">
+    <input placeholder="粘贴新闻链接，回车加入待播池…" />
+    <button class="btn">加入</button>
+  </div>
+
+  <section class="day">
+    <div class="day-head">
+      <div class="day-title">10 月 18 日 · 今天</div>
+      <div class="day-meta">共 <b>3</b> 条 · 待播 <b>1</b> · 已播 <b>1</b></div>
+      <div class="spill">把未播出的顺延到明天 →</div>
+    </div>
+
+    <article class="card">
+      <div class="card-main">
+        <div class="card-title"><a href="#">国产大模型 Qwen3 发布，官方称推理成本下降 40%</a></div>
+        <div class="meta"><span class="src">机器之心</span><span>·</span><span>小满 添加 · 12 分钟前</span></div>
+        <div class="note">配图用发布会现场图；基准对比表在这里 <a href="#">https://example.com/qwen3-bench</a></div>
+      </div>
+      <div class="card-side">
+        <span class="badge-star">★ 重点</span>
+        <button class="pill pending" title="点击标记为已播">待播</button>
+        <button class="ghost">☆ 重点</button>
+        <button class="ghost">⋯</button>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-main">
+        <div class="card-title"><a href="#">苹果 M5 芯片跑分曝光，单核提升约 18%</a></div>
+        <div class="meta"><span class="src">IT之家</span><span>·</span><span>阿凯 播出于 09:20</span></div>
+      </div>
+      <div class="card-side">
+        <button class="pill done" title="点击改回待播">已播</button>
+        <button class="ghost">☆ 重点</button>
+        <button class="ghost">⋯</button>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-main">
+        <div class="card-title" style="color:var(--muted)"><a href="#">某大厂裁员传闻（未证实）</a></div>
+        <div class="meta"><span class="src">来源待核实</span><span>·</span><span>老周 添加 · 昨天</span></div>
+      </div>
+      <div class="card-side">
+        <button class="pill skipped" title="点击恢复待播">略过</button>
+        <button class="ghost">☆ 重点</button>
+        <button class="ghost">⋯</button>
+      </div>
+    </article>
+  </section>
+
+  <section class="day">
+    <div class="day-head">
+      <div class="day-title">10 月 19 日 · 明天</div>
+      <div class="day-meta">共 <b>1</b> 条 · 待播 <b>1</b></div>
+      <div class="spill">把未播出的顺延到后天 →</div>
+    </div>
+
+    <article class="card">
+      <div class="card-main">
+        <div class="card-title"><a href="#">欧盟《AI 法案》最终文本审议通过</a></div>
+        <div class="meta"><span class="src">Reuters</span><span>·</span><span>老周 添加 · 1 小时前</span></div>
+        <div class="note">重点讲对开源模型的影响条款，时长控制 3 分钟。</div>
+      </div>
+      <div class="card-side">
+        <button class="pill pending" title="点击标记为已播">待播</button>
+        <button class="ghost">☆ 重点</button>
+        <button class="ghost">⋯</button>
+      </div>
+    </article>
+  </section>
+
+  <section class="spec">
+    <h3>方案 01 · 暖调编辑（Editorial Warm）—— 规格</h3>
+    <div class="spec-grid">
+      <div>
+        <b>配色</b>
+        暖白画布 #F7F6F3 · 纯白卡片 · 发丝分隔线 #EAEAEA；
+        状态用低饱和粉彩：琥珀 #FBF3DB、鼠尾草 #EDF3EC、雾灰 #F1F0EE。
+        颜色只做语义标记，不铺大色块。
+        <div class="swatches">
+          <span class="sw" style="background:#f7f6f3"></span><span class="sw" style="background:#fff"></span>
+          <span class="sw" style="background:#fbf3db"></span><span class="sw" style="background:#edf3ec"></span>
+          <span class="sw" style="background:#e1f3fe"></span><span class="sw" style="background:#111"></span>
+        </div>
+      </div>
+      <div>
+        <b>版面</b>
+        940px 单列、大留白（分组间距 52px）；衬线大标题 + 无衬线正文形成字号对比
+        （26px 日期 / 16.5px 标题 / 13px 备注）。卡片扁平，靠 1px 线与留白分区，不用阴影。
+      </div>
+      <div>
+        <b>按钮</b>
+        主按钮：纯黑 #111 圆角 6px，白字，hover 变 #333，按下 scale(.98)。
+        状态胶囊：全圆角粉彩 pill，点击即 待播↔已播。
+        次要动作：透明底 + 1px 边框，hover 描边变黑。全部扁平、无渐变、无发光。
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

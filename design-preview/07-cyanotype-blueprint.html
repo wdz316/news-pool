@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>新闻池 · 方案 07 · 氰版蓝图</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --blue:#0b2947;--blue-2:#0e3357;--blue-3:#123f69;
+  --line:rgba(140,205,235,.34);--line-soft:rgba(140,205,235,.16);--line-hard:rgba(160,220,245,.7);
+  --cyan:#8fd6f0;--cyan-bright:#c6ecff;--paper:#eaf4fa;--dim:#6f9dc0;
+  --cond:'Oswald','Arial Narrow','Noto Sans SC',sans-serif;
+  --mono:'Space Mono','IBM Plex Mono',Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--blue);color:var(--cyan);font-family:var(--cond);font-weight:300;font-size:15px;line-height:1.55}
+/* 制图网格底纹 */
+.grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 47px,var(--line-soft) 47px,var(--line-soft) 48px),
+    repeating-linear-gradient(90deg,transparent,transparent 47px,var(--line-soft) 47px,var(--line-soft) 48px);
+  background-position:center top}
+.sheet{position:relative;z-index:2;max-width:1140px;margin:0 auto;padding:0 30px 80px}
+a{color:inherit;text-decoration:none}
+.mono{font-family:var(--mono)}
+
+/* ── 图框：四角裁切标记 ── */
+.frame{position:relative}
+.crop{position:absolute;width:14px;height:14px;border:1px solid var(--line-hard)}
+.crop.tl{top:14px;left:14px;border-right:0;border-bottom:0}
+.crop.tr{top:14px;right:14px;border-left:0;border-bottom:0}
+.crop.bl{bottom:14px;left:14px;border-right:0;border-top:0}
+.crop.br{bottom:14px;right:14px;border-left:0;border-top:0}
+
+/* ── 标题栏 ── */
+.titleblock{display:flex;align-items:flex-end;gap:24px;padding:40px 0 14px;border-bottom:1px solid var(--line-hard)}
+.tb-no{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--dim);padding-bottom:12px}
+.tb-title{font-size:clamp(2rem,5vw,3.2rem);font-weight:500;letter-spacing:.02em;text-transform:uppercase;line-height:.92;margin:0}
+.tb-meta{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--dim);text-align:right;line-height:1.9;text-transform:uppercase}
+.tb-meta b{color:var(--cyan-bright);font-weight:400}
+
+/* ── 坐标/刻度带 ── */
+.ruler{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--dim);padding:6px 0;border-bottom:1px solid var(--line-soft)}
+
+/* ── 输入 ── */
+.input{display:grid;grid-template-columns:auto 1fr auto;border:1px solid var(--line);margin:26px 0 40px}
+.input>*{padding:13px 16px}
+.input .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--dim);border-right:1px solid var(--line);display:flex;align-items:center;text-transform:uppercase}
+.input input{border:0;outline:0;background:transparent;font-family:var(--mono);font-size:13px;color:var(--cyan-bright);width:100%}
+.input input::placeholder{color:rgba(140,205,235,.4)}
+.btn{border:0;border-left:1px solid var(--line);background:transparent;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan-bright);cursor:pointer}
+.btn:hover{background:var(--cyan-bright);color:var(--blue)}
+
+/* ── 分组 ── */
+.day{margin-bottom:36px}
+.dayhead{display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--line-hard)}
+.dayhead .dz{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--dim)}
+.dayhead h2{font-size:24px;font-weight:400;letter-spacing:.06em;text-transform:uppercase;margin:0}
+.dayhead h2 i{color:var(--cyan-bright);font-style:normal}
+.dayhead .spill{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);border:1px solid var(--line);padding:6px 12px;cursor:pointer}
+.dayhead .spill:hover{background:var(--line-soft);color:var(--cyan-bright)}
+
+/* ── 条目：蓝图表格 ── */
+.rec{display:grid;grid-template-columns:70px 1fr 200px;border-bottom:1px solid var(--line-soft)}
+.rec:hover{background:rgba(143,214,240,.05)}
+.rec .no{font-family:var(--mono);font-size:11px;color:var(--dim);padding:18px 0;border-right:1px solid var(--line-soft);text-align:center;letter-spacing:.1em}
+.rec .c{padding:16px 20px}
+.rec .t{font-size:18px;font-weight:400;letter-spacing:.01em;line-height:1.4}
+.rec .t:hover{color:var(--cyan-bright);text-shadow:0 0 18px rgba(143,214,240,.5)}
+.rec .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;margin-top:7px}
+.rec .meta b{color:var(--cyan);font-weight:400}
+.rec .note{margin-top:11px;padding:9px 12px;border:1px dashed var(--line);font-family:var(--mono);font-size:11.5px;color:var(--cyan);line-height:1.65}
+.rec .note a{color:var(--cyan-bright);text-decoration:underline;text-underline-offset:2px;word-break:break-all}
+.rec .ops{padding:16px 18px;border-left:1px solid var(--line-soft);display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.state{background:transparent;border:1px solid var(--line-hard);font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan-bright);padding:6px 11px;cursor:pointer}
+.state.pending:hover{background:var(--cyan-bright);color:var(--blue)}
+.state.done{border-style:double;border-width:3px;color:var(--dim);border-color:var(--line)}
+.state.done:hover{border-style:solid;border-width:1px;color:var(--cyan-bright);border-color:var(--line-hard)}
+.state.skipped{color:var(--dim);border-color:var(--line);border-style:dashed}
+.tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:var(--blue);background:var(--cyan-bright);padding:3px 8px;text-transform:uppercase}
+.ghost{background:transparent;border:1px solid var(--line);font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--dim);padding:5px 10px;cursor:pointer}
+.ghost:hover{color:var(--cyan-bright);border-color:var(--line-hard)}
+.cross{width:12px;height:12px;position:relative;align-self:center}
+.cross:before,.cross:after{content:'';position:absolute;background:var(--line-hard)}
+.cross:before{left:5px;top:0;width:1px;height:12px}
+.cross:after{top:5px;left:0;height:1px;width:12px}
+
+.spec{margin-top:44px;border:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr)}
+.spec>div{padding:20px;border-right:1px solid var(--line-soft)}
+.spec>div:last-child{border-right:0}
+.spec h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan-bright);margin:0 0 12px;font-weight:400}
+.spec p{margin:0;font-family:var(--mono);font-size:11.5px;line-height:1.8;color:var(--dim)}
+.sw{display:inline-block;width:20px;height:20px;border:1px solid var(--line);margin:10px 6px 0 0}
+@media(max-width:820px){
+  .rec{grid-template-columns:48px 1fr}
+  .rec .ops{grid-column:1/-1;border-left:0;border-top:1px solid var(--line-soft);flex-direction:row;align-items:center;justify-content:flex-start}
+  .tb-meta{display:none}
+  .spec{grid-template-columns:1fr}.spec>div{border-right:0;border-bottom:1px solid var(--line-soft)}
+}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="sheet frame">
+  <span class="crop tl"></span><span class="crop tr"></span><span class="crop bl"></span><span class="crop br"></span>
+
+  <div class="titleblock">
+    <span class="tb-no">SHEET 07 / 05</span>
+    <h1 class="tb-title">待播池 · 蓝图</h1>
+    <div class="tb-meta">POOL <b>DEMO-01</b><br />SCALE 1:1 &nbsp; REV <b>2026-10-18</b><br />OPERATOR <b>阿凯</b></div>
+  </div>
+  <div class="ruler">
+    <span>0</span><span>120</span><span>240</span><span>360</span><span>480</span><span>600</span><span>720</span><span>840</span>
+  </div>
+
+  <div class="input">
+    <span class="lab">&gt;&gt; 录入 URL</span>
+    <input placeholder="paste news url — 回车加入待播池" />
+    <button class="btn">ADD</button>
+  </div>
+
+  <section class="day">
+    <div class="dayhead">
+      <span class="dz">SEC / A</span>
+      <h2>10-18 · 今天 <i>（03 条）</i></h2>
+      <span class="spill">SPILL &gt;&gt; 顺延至 10-19</span>
+    </div>
+
+    <div class="rec">
+      <div class="no">01</div>
+      <div class="c">
+        <div class="t"><a href="#">国产大模型 Qwen3 发布，官方称推理成本下降 40%</a></div>
+        <div class="meta">SRC <b>机器之心</b> · ADD <b>小满</b> · 12 MIN AGO · ★ 重点</div>
+        <div class="note">配图用发布会现场图；基准对比表 <a href="#">https://example.com/qwen3-bench</a></div>
+      </div>
+      <div class="ops">
+        <span class="tag">★ 重点</span>
+        <span class="cross"></span>
+        <button class="state pending" title="点击标记为已播">待播 ●</button>
+        <button class="ghost">☆</button>
+        <button class="ghost">⋯</button>
+      </div>
+    </div>
+
+    <div class="rec">
+      <div class="no">02</div>
+      <div class="c">
+        <div class="t"><a href="#">苹果 M5 芯片跑分曝光，单核提升约 18%</a></div>
+        <div class="meta">SRC <b>IT之家</b> · AIRED BY <b>阿凯</b> @ 09:20</div>
+      </div>
+      <div class="ops">
+        <span class="cross"></span>
+        <button class="state done" title="点击改回待播">已播 ○</button>
+        <button class="ghost">☆</button>
+        <button class="ghost">⋯</button>
+      </div>
+    </div>
+
+    <div class="rec">
+      <div class="no">03</div>
+      <div class="c">
+        <div class="t" style="color:var(--dim)"><a href="#">某大厂裁员传闻（未证实）</a></div>
+        <div class="meta">SRC <b>UNVERIFIED</b> · ADD <b>老周</b> · YESTERDAY</div>
+      </div>
+      <div class="ops">
+        <span class="cross"></span>
+        <button class="state skipped" title="点击恢复待播">略过 —</button>
+        <button class="ghost">☆</button>
+        <button class="ghost">⋯</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="day">
+    <div class="dayhead">
+      <span class="dz">SEC / B</span>
+      <h2>10-19 · 明天 <i>（01 条）</i></h2>
+      <span class="spill">SPILL &gt;&gt; 顺延至 10-20</span>
+    </div>
+    <div class="rec">
+      <div class="no">04</div>
+      <div class="c">
+        <div class="t"><a href="#">欧盟《AI 法案》最终文本审议通过</a></div>
+        <div class="meta">SRC <b>Reuters</b> · ADD <b>老周</b> · 1 H AGO</div>
+        <div class="note">重点讲对开源模型的影响条款，时长控制 3 分钟。</div>
+      </div>
+      <div class="ops">
+        <span class="cross"></span>
+        <button class="state pending" title="点击标记为已播">待播 ●</button>
+        <button class="ghost">☆</button>
+        <button class="ghost">⋯</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="spec">
+    <div>
+      <h4>[ 配色 PALETTE ]</h4>
+      <p>普鲁士蓝 #0B2947 底 + 淡青线条 #8FD6F0 / 亮青 #C6ECFF。单色系（蓝），
+      靠线的透明度分层，不用任何第二种色相。</p>
+      <div><span class="sw" style="background:#0b2947"></span><span class="sw" style="background:#123f69"></span><span class="sw" style="background:#8fd6f0"></span><span class="sw" style="background:#c6ecff"></span></div>
+    </div>
+    <div>
+      <h4>[ 版面 LAYOUT ]</h4>
+      <p>1140px 制图板：固定网格底纹、四角裁切标记、顶部坐标刻度带。
+      条目是蓝图记录表（编号 / 内容 / 操作）三栏。等宽字标注尺寸与编号，窄体大写做标题。</p>
+    </div>
+    <div>
+      <h4>[ 按钮 BUTTONS ]</h4>
+      <p>全部直角描边。待播=实心点击翻白，已播=双线框（○），略过=虚线框（—）。
+      装饰用十字定位符 + 裁切角 + &gt;&gt; 箭头。hover 时标题带青色辉光。</p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

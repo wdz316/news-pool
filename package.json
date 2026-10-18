@@ -1,0 +1,21 @@
+{
+  "name": "news-pool",
+  "version": "0.3.0",
+  "description": "共享新闻池 - 多人协作的实时待播新闻池（本地优先，零构建）",
+  "main": "src/server.js",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node verify/smoke.cjs",
+    "smoke": "node verify/smoke.cjs",
+    "audit": "node scripts/audit.cjs"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.10.0",
+    "ws": "^8.18.0"
+  }
+}

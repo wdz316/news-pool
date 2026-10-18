@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>新闻池 · UI 方案预览（10 套）</title>
+<style>
+:root{--bg:#0e0e10;--ink:#f4f4f5;--muted:#9a9aa2;--line:rgba(255,255,255,.12)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,'SF Pro Display','PingFang SC','Microsoft YaHei',sans-serif;
+  font-size:15px;line-height:1.6;padding:60px 24px}
+.wrap{max-width:1120px;margin:0 auto}
+h1{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;letter-spacing:-.03em;margin:0 0 10px}
+.sub{color:var(--muted);font-size:14px;margin-bottom:18px}
+.group{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:38px 0 14px;border-top:1px solid var(--line);padding-top:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+a.card{display:block;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:18px;overflow:hidden;
+  background:#16161a;transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s}
+a.card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.3)}
+.thumb{height:140px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;letter-spacing:.02em;text-align:center;padding:0 18px}
+.t1{background:#f7f6f3;color:#111}
+.t2{background:radial-gradient(120% 120% at 20% 0%,#2a1f5e,#050505 60%);color:#f2b45c}
+.t3{background:#f4f4f0;color:#050505;border-bottom:3px solid #e61919}
+.t4{background:#0a0a0a;color:#4af626;background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.5) 2px,rgba(0,0,0,.5) 4px)}
+.t5{background:#f5f5f7;color:#0b0b0d}
+.t6{background:#fdfbf7;color:#241e17;border-bottom:3px solid #b08a4a}
+.t7{background:#0b2947;color:#8fd6f0;background-image:repeating-linear-gradient(0deg,transparent,transparent 15px,rgba(140,205,235,.12) 15px,rgba(140,205,235,.12) 16px),repeating-linear-gradient(90deg,transparent,transparent 15px,rgba(140,205,235,.12) 15px,rgba(140,205,235,.12) 16px)}
+.t8{background:#f4f1ea;color:#1b3a6b;background-image:radial-gradient(circle,rgba(27,58,107,.18) 1px,transparent 1.4px);background-size:6px 6px}
+.t9{background:#e6e1d7;color:#1a1a1c}
+.t10{background:#05060a;color:#00f0ff;background-image:radial-gradient(120% 70% at 50% -10%,rgba(0,240,255,.22),transparent 60%),radial-gradient(80% 50% at 100% 0%,rgba(255,47,185,.2),transparent 60%)}
+.body{padding:16px 18px 20px}
+.name{font-size:16px;font-weight:700;margin-bottom:4px}
+.desc{font-size:13px;color:var(--muted);line-height:1.6}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.tag{font-size:11px;padding:3px 9px;border:1px solid var(--line);border-radius:999px;color:var(--muted)}
+.foot{margin-top:36px;color:var(--muted);font-size:12.5px;line-height:1.8;border-top:1px solid var(--line);padding-top:20px}
+code{background:rgba(255,255,255,.08);padding:1px 6px;border-radius:5px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>新闻池 · UI 方案预览 · 10 套</h1>
+  <div class="sub">同一份示例数据（4 条新闻 / 3 名成员 / 3 种状态）在 10 套视觉语言下的呈现。点击任意卡片在新标签打开。</div>
+
+  <div class="group">第一批 · 01–05</div>
+  <div class="grid">
+    <a class="card" href="01-warm-editorial.html" target="_blank">
+      <div class="thumb t1">暖白纸面 · 衬线标题 · 粉彩胶囊</div>
+      <div class="body">
+        <div class="name">01 · 暖调编辑 Editorial Warm</div>
+        <div class="desc">暖白画布 + 发丝分隔线，衬线大标题，状态用低饱和粉彩。克制、耐读。</div>
+        <div class="tags"><span class="tag">浅色</span><span class="tag">极简</span><span class="tag">编辑风</span></div>
+      </div>
+    </a>
+    <a class="card" href="02-oled-glass.html" target="_blank">
+      <div class="thumb t2">OLED 纯黑 · 呼吸光斑 · 双层玻璃卡</div>
+      <div class="body">
+        <div class="name">02 · 暗夜玻璃 OLED Glass</div>
+        <div class="desc">纯黑 OLED + 悬浮玻璃胶囊导航，双层包边卡片，主按钮内嵌圆球图标。</div>
+        <div class="tags"><span class="tag">深色</span><span class="tag">玻璃拟态</span><span class="tag">高级感</span></div>
+      </div>
+    </a>
+    <a class="card" href="03-swiss-print.html" target="_blank">
+      <div class="thumb t3">未漂白纸 · 碳黑巨字 · 警示红</div>
+      <div class="body">
+        <div class="name">03 · 工业蓝图 Swiss Print</div>
+        <div class="desc">瑞士印刷体 + 军工手册：刚性网格、极端字号对比、警示红、零圆角。</div>
+        <div class="tags"><span class="tag">浅色</span><span class="tag">粗野主义</span><span class="tag">高密度</span></div>
+      </div>
+    </a>
+    <a class="card" href="04-telemetry-crt.html" target="_blank">
+      <div class="thumb t4">CRT 扫描线 · 磷白/警示红 · 终端绿</div>
+      <div class="body">
+        <div class="name">04 · 战术终端 Telemetry CRT</div>
+        <div class="desc">等宽字体台账、方括号命令按钮、扫描线 + 暗角。冷峻、极客。</div>
+        <div class="tags"><span class="tag">深色</span><span class="tag">终端</span><span class="tag">数据密集</span></div>
+      </div>
+    </a>
+    <a class="card" href="05-soft-structural.html" target="_blank">
+      <div class="thumb t5">银灰浮岛 · 超大粗体 · 软阴影 bento</div>
+      <div class="body">
+        <div class="name">05 · 软结构主义 Soft Structuralism</div>
+        <div class="desc">银灰底 + 纯白浮起卡片，超高扩散软阴影，非对称 bento，超大粗体。</div>
+        <div class="tags"><span class="tag">浅色</span><span class="tag">Bento</span><span class="tag">现代</span></div>
+      </div>
+    </a>
+  </div>
+
+  <div class="group">第二批 · 06–10（新增）</div>
+  <div class="grid">
+    <a class="card" href="06-editorial-luxury.html" target="_blank">
+      <div class="thumb t6">象牙纸 · 巨幅衬线 · 浓咖 + 旧金</div>
+      <div class="body">
+        <div class="name">06 · 暖金奢品 Editorial Luxury</div>
+        <div class="desc">象牙白纸面 + 浓咖墨 + 鼠尾草绿/旧金，巨幅衬线陈述，纸张颗粒。像一本杂志。</div>
+        <div class="tags"><span class="tag">浅色</span><span class="tag">奢华</span><span class="tag">衬线</span></div>
+      </div>
+    </a>
+    <a class="card" href="07-cyanotype-blueprint.html" target="_blank">
+      <div class="thumb t7">普鲁士蓝 · 制图网格 · 裁切角</div>
+      <div class="body">
+        <div class="name">07 · 氰版蓝图 Cyanotype Blueprint</div>
+        <div class="desc">普鲁士蓝工程图纸：网格底纹、坐标刻度、四角裁切标记、等宽标注。冷、准。</div>
+        <div class="tags"><span class="tag">深色</span><span class="tag">技术图纸</span><span class="tag">单色系</span></div>
+      </div>
+    </a>
+    <a class="card" href="08-riso-duotone.html" target="_blank">
+      <div class="thumb t8">半调网点 · 油墨蓝 + 荧光粉 · 错版</div>
+      <div class="body">
+        <div class="name">08 · 双色丝网 Riso Duotone</div>
+        <div class="desc">米灰纸 + 两个专色，半调网点、标题“套印错位”、硬边实心投影。手工印感。</div>
+        <div class="tags"><span class="tag">浅色</span><span class="tag">印刷</span><span class="tag">双色</span></div>
+      </div>
+    </a>
+    <a class="card" href="09-zaxis-cascade.html" target="_blank">
+      <div class="thumb t9">暖灰桌面 · 旋转叠压 · 色脊 + 景深</div>
+      <div class="body">
+        <div class="name">09 · 层叠卡片 Z-Axis Cascade</div>
+        <div class="desc">条目像桌上码的一摞实体卡：轻微旋转、上下叠压、多层投影；hover 摆正抬起。</div>
+        <div class="tags"><span class="tag">浅色</span><span class="tag">立体</span><span class="tag">触感</span></div>
+      </div>
+    </a>
+    <a class="card" href="10-cyber-neon.html" target="_blank">
+      <div class="thumb t10">切角面板 · 霓虹青/洋红 · 透视网格</div>
+      <div class="body">
+        <div class="name">10 · 赛博霓虹 Cyber Neon</div>
+        <div class="desc">近黑深空 + 霓虹青/洋红对撞、切角面板、HUD 状态条、发光与 glitch 色差。最“顶”的一套。</div>
+        <div class="tags"><span class="tag">深色</span><span class="tag">霓虹</span><span class="tag">赛博</span></div>
+      </div>
+    </a>
+  </div>
+
+  <div class="foot">
+    这些是纯静态预览（每页自包含、可离线打开），用来对比「配色 / 版面 / 按钮」三件事，不是可直接上线的代码。<br />
+    定了方向后，把选中那套的 token（颜色变量、圆角、阴影、字体、按钮样式）移植进 <code>news-pool/public/style.css</code> 即可，交互逻辑（状态胶囊、⋯ 菜单、统计跳转、备注链接）保持不变。
+  </div>
+</div>
+</body>
+</html>
