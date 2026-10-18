@@ -164,8 +164,22 @@ async function main() {
     console.log('  SHA256: ' + sum);
 
     console.log('[6/6] 创建 GitHub Release…');
-    const attachList = attachedExisting.length
-      ? '\n### 📎 附件\n' + attachedExisting.map((f) => '- `' + path.basename(f) + '`').join('\n') + '\n'
+    // GitHub Release 的附件名要 ASCII：中文名会被存成 default.pdf，所以先换成 ASCII 文件名再传
+    const isAscii = (s) => /^[\x20-\x7e]+$/.test(s);
+    const attachFiles = [];
+    attachedExisting.forEach((f) => {
+      const abs = path.resolve(ROOT, f);
+      const base = path.basename(abs);
+      if (isAscii(base)) { attachFiles.push(abs); return; }
+      const ext = path.extname(base);
+      const stem = path.basename(base, ext).replace(/[^\x20-\x7e]/g, '').trim() || 'attachment';
+      const safe = path.join(distDir, stem + ext);
+      fs.copyFileSync(abs, safe);
+      console.log('  附件中文名已改为 ASCII：' + base + ' → ' + path.basename(safe));
+      attachFiles.push(safe);
+    });
+    const attachList = attachFiles.length
+      ? '\n### 📎 附件\n' + attachFiles.map((f) => '- `' + path.basename(f) + '`').join('\n') + '\n'
       : '';
     const dlSection = [
       '### 📦 下载校验（防掉包）',
@@ -197,7 +211,7 @@ async function main() {
       '--title', TAG + ' · 共享新闻池',
       '--notes-file', notesFile,
       zipPath];
-    for (const f of attachedExisting) releaseArgs.push(path.resolve(ROOT, f));
+    for (const f of attachFiles) releaseArgs.push(f);
     run('gh', releaseArgs, work);
 
     console.log('\n✓ 发布完成');

@@ -66,4 +66,9 @@ if (!fs.existsSync(TMP) || fs.statSync(TMP).size === 0) {
 }
 fs.rmSync(OUT, { force: true });
 fs.renameSync(TMP, OUT);
+// 再放一份 ASCII 文件名的副本：GitHub Release 上传时中文名会被存成 default.pdf，发布用这份
+const OUT_ASCII = path.join(OUT_DIR, 'manual.pdf');
+fs.rmSync(OUT_ASCII, { force: true });
+fs.copyFileSync(OUT, OUT_ASCII);
 console.log('✓ 已生成：' + path.relative(ROOT, OUT) + '  (' + fs.statSync(OUT).size + ' 字节)');
+console.log('  发布用副本（ASCII 文件名）：' + path.relative(ROOT, OUT_ASCII));
