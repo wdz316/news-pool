@@ -120,7 +120,7 @@ npm run audit
 7. 顶栏 **统计** → 月历网格，确认每天的「准备 / 已播」数。
 8. 顶栏 **外观** → 挑一套风格（如「暗夜玻璃」「赛博霓虹」）→ 界面立即变样；刷新后仍是你选的；换个浏览器 / 无痕窗口仍是默认（各人各选）。
 
-自动化冒烟测试（113 项）：
+自动化冒烟测试（117 项）：
 
 ```bash
 npm test        # 或 node verify/smoke.cjs
@@ -158,7 +158,7 @@ news-pool/
 # 在项目根目录
 git init
 git add .
-git commit -m "共享新闻池 v0.3.0"
+git commit -m "共享新闻池 v0.3.1"
 git branch -M main
 git remote add origin https://github.com/<你的用户名>/news-pool.git
 git push -u origin main

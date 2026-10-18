@@ -467,6 +467,10 @@ button.mini.more { padding: 7px 13px; font-weight: 800; font-size: 15px; line-he
 .item-menu .menu-item.pend { color: var(--amber); }
 .item-menu .menu-item.danger { color: var(--rust); }
 .item-menu .menu-item.danger:hover { background: color-mix(in oklab, var(--rust) 14%, transparent); }
+/* 展开「⋯」菜单时把整张卡抬到其它卡片之上。
+   否则「已播/略过」卡的 opacity(<1) 会形成层叠上下文，把菜单压在下一张卡下面（菜单被挡）。 */
+.item.menu-open { position: relative; z-index: 60; }
+.item.menu-open:hover { box-shadow: -4px 0 24px -8px rgba(0, 0, 0, .5); }
 
 /* ---------- 导出弹窗 ---------- */
 .export-text {

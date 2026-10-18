@@ -445,6 +445,12 @@ async function main() {
     check(css.includes('.theme-swatch.active'), '外观面板有选中态样式');
     check(!css.includes('repeating-linear-gradient'), '战术终端已去掉扫描线细线（不铺满屏）');
 
+    console.log('\n[12c] ⋯ 菜单遮挡回归：展开时抬高整张卡');
+    check(css.includes('.item.menu-open'), 'style.css 含 .item.menu-open 抬高层');
+    check(/\.item\.menu-open\s*\{[^}]*z-index/.test(css), '抬高层明确设置了 z-index');
+    check(js.includes("classList.add('menu-open')"), 'app.js 展开菜单时给卡片加 menu-open');
+    check(js.includes("remove('menu-open')"), 'app.js closeMenu 会移除 menu-open（放下卡片）');
+
     console.log('\n[13] 傻瓜安装 / 无后门自证 交付物检查');
     const readRoot = (rel) => { try { return fs.readFileSync(path.join(__dirname, '..', rel), 'utf8'); } catch { return ''; } };
     const auditSrc = readRoot('scripts/audit.cjs');

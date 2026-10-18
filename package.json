@@ -1,6 +1,6 @@
 {
   "name": "news-pool",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "共享新闻池 - 多人协作的实时待播新闻池（本地优先，零构建）",
   "main": "src/server.js",
   "license": "MIT",

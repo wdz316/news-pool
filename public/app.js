@@ -856,6 +856,8 @@ function closeMenu() {
     const b = p.parentElement && p.parentElement.querySelector('button.more');
     if (b) b.setAttribute('aria-expanded', 'false');
   }
+  // 同时放下被抬高的卡片（否则它会一直盖住下一张卡）
+  for (const card of document.querySelectorAll('.item.menu-open')) card.classList.remove('menu-open');
 }
 
 /** 条目次要操作收进「⋯」菜单：改标题 / 核查 / 略过 / 恢复待播 / 移动 / 复制 / 删除 */
@@ -904,6 +906,9 @@ function buildItemMenu(it) {
     if (willOpen) {
       pop.classList.remove('hidden');
       btn.setAttribute('aria-expanded', 'true');
+      // 抬高本卡，避免菜单被下一张卡（尤其已播/略过卡的 opacity 层叠上下文）遮住
+      const card = wrap.closest('.item');
+      if (card) card.classList.add('menu-open');
     }
   });
 
