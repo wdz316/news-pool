@@ -452,6 +452,8 @@ async function main() {
     check(js.includes("remove('menu-open')"), 'app.js closeMenu 会移除 menu-open（放下卡片）');
     check(js.includes("closest('.item')"), 'app.js 用 closest(.item) 定位并抬高卡片');
     check(/\[data-theme="neon"\]\s*\.item\.menu-open\s*\{[^}]*clip-path:\s*none/.test(css), '赛博霓虹：菜单展开时取消切角 clip-path（否则菜单被裁）');
+    check(css.includes('.menu-pop.up'), 'style.css 含 .menu-pop.up（空间不足向上弹）');
+    check(js.includes("classList.add('up')"), 'app.js 空间不足时给菜单加 up');
 
     console.log('\n[13] 傻瓜安装 / 无后门自证 交付物检查');
     const readRoot = (rel) => { try { return fs.readFileSync(path.join(__dirname, '..', rel), 'utf8'); } catch { return ''; } };
@@ -468,6 +470,18 @@ async function main() {
     check(readRoot('给访客的一页纸.md').includes('你只要做 3 步'), '给访客的一页纸.md 存在');
     check(readRoot('README.md').includes('npm run audit'), 'README 提到 npm run audit');
     check(readRoot('start.bat').includes('winget'), 'start.bat 支持 winget 一键装 Node');
+
+    console.log('\n[14] 发布工具 / 使用手册 交付物检查');
+    const publishSrc = readRoot('scripts/publish.cjs');
+    check(publishSrc.includes('gh') && publishSrc.includes("'release'"), 'scripts/publish.cjs 存在（一键发布）');
+    check(publishSrc.includes("'archive'") && publishSrc.includes('--format=zip') && (publishSrc.includes('sha256') || publishSrc.includes('SHA256')), 'publish.cjs 生成 zip 并计算 SHA256');
+    check(readRoot('scripts/manual.cjs').includes('print-to-pdf'), 'scripts/manual.cjs 存在（无头浏览器生成 PDF）');
+    const manualHtml = readRoot('docs/使用手册.html');
+    check(manualHtml.includes('使用手册') && manualHtml.includes('@page'), 'docs/使用手册.html 存在且为打印优化');
+    check(pkgJson.scripts.release === 'node scripts/publish.cjs', 'package.json 含 release 脚本');
+    check(pkgJson.scripts.manual === 'node scripts/manual.cjs', 'package.json 含 manual 脚本');
+    check(!!(pkgJson.repository && String(pkgJson.repository.url || '').includes('github.com')), 'package.json 含 repository（发布工具据此定位仓库）');
+    check(readRoot('README.md').includes('您可以使用 AI 代理进行修改'), 'README 含「可用 AI 代理修改」说明');
 
     ws.close();
   } finally {

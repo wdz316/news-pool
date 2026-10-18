@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>共享新闻池 · 使用手册</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+    color: #1a1a1a; font-size: 10.5pt; line-height: 1.7;
+  }
+  h1 { font-size: 22pt; margin: 0 0 2mm; letter-spacing: .02em; }
+  .sub { color: #666; font-size: 10pt; margin: 0 0 8mm; }
+  h2 {
+    font-size: 13pt; margin: 9mm 0 3mm; padding-bottom: 1.6mm;
+    border-bottom: 1.5px solid #1a1a1a; page-break-after: avoid;
+  }
+  h3 { font-size: 11pt; margin: 5mm 0 2mm; page-break-after: avoid; }
+  p { margin: 0 0 2.5mm; }
+  ul, ol { margin: 0 0 3mm; padding-left: 6mm; }
+  li { margin-bottom: 1.2mm; }
+  code, kbd {
+    font-family: Consolas, "Cascadia Mono", monospace;
+    background: #f2f2f2; border: 1px solid #e0e0e0; border-radius: 3px;
+    padding: 0.4mm 1.4mm; font-size: 9.5pt;
+  }
+  pre {
+    font-family: Consolas, "Cascadia Mono", monospace; font-size: 9pt;
+    background: #f7f7f7; border: 1px solid #e2e2e2; border-left: 3px solid #444;
+    border-radius: 3px; padding: 3mm 4mm; margin: 0 0 3mm; white-space: pre-wrap;
+    page-break-inside: avoid;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 0 0 4mm; page-break-inside: avoid; }
+  th, td { border: 1px solid #d5d5d5; padding: 2mm 2.5mm; text-align: left; vertical-align: top; font-size: 10pt; }
+  th { background: #f0f0f0; font-weight: 700; }
+  .callout {
+    border: 1px solid #d8c47a; background: #fdf8e8; border-radius: 4px;
+    padding: 3mm 4mm; margin: 0 0 4mm; page-break-inside: avoid;
+  }
+  .callout strong { color: #8a6d0b; }
+  .danger { border-color: #d9a1a1; background: #fdf0f0; }
+  .danger strong { color: #a33; }
+  .meta { color: #666; font-size: 9pt; }
+  section { page-break-inside: auto; }
+  .kv { margin: 0 0 3mm; }
+  footer { margin-top: 8mm; border-top: 1px solid #ddd; padding-top: 2mm; color: #888; font-size: 8.5pt; }
+</style>
+</head>
+<body>
+
+<h1>共享新闻池 · 使用手册</h1>
+<p class="sub">多人协作的实时待播新闻池 ｜ 本地优先 · 零构建 · 开源(MIT) · 一键启动</p>
+
+<section>
+<h2>一、这是什么</h2>
+<p>每人登录后，把自己准备播的新闻丢进同一个「池子」。系统会：</p>
+<ul>
+  <li><strong>实时同步</strong>给所有在线的人（谁都不能重复报同一条）；</li>
+  <li>发现重复时<strong>立刻提示</strong>「这条 X 分钟前已经有人加了」；</li>
+  <li>一键<strong>联网核查</strong>：搜一下有没有其他来源报道同一件事；</li>
+  <li>播完打勾，并记录<strong>是谁播的</strong>；还能按人、按天<strong>导出清单</strong>。</li>
+</ul>
+<p><strong>数据全部保存在你自己的电脑上</strong>，不上传任何云服务，不需要注册账号即可使用。</p>
+</section>
+
+<section>
+<h2>二、三种用法（选一个）</h2>
+<p>一台电脑当「<strong>主机</strong>」，其他人用浏览器访问它 —— <strong>主机配置一次，访客什么都不用装。</strong></p>
+<table>
+  <thead><tr><th style="width:20%">用哪种</th><th style="width:26%">适合</th><th style="width:26%">访客怎么进</th><th>成本 / 隐私</th></tr></thead>
+  <tbody>
+    <tr><td><strong>① 局域网</strong>（推荐）</td><td>同一办公室 / 同 WiFi</td><td>浏览器打开 <code>http://主机IP:3210</code></td><td>免费；数据不出内网，最私密</td></tr>
+    <tr><td><strong>② 内网穿透隧道</strong></td><td>三个人不在同一地方</td><td>打开一个公网网址（自带 HTTPS）</td><td>免费；数据经加密隧道</td></tr>
+    <tr><td><strong>③ 云服务器 VPS</strong></td><td>要 24 小时在线</td><td>打开固定网址</td><td>每月少量费用；数据存在第三方服务器</td></tr>
+  </tbody>
+</table>
+<p class="meta">详细步骤（含防火墙、HTTPS、安全注意）见仓库里的 <code>部署指南.md</code>。</p>
+</section>
+
+<section>
+<h2>三、快速开始（主机做一次）</h2>
+<ol>
+  <li>装 <strong>Node.js 18+</strong>：<code>https://nodejs.org/</code>
+    <br /><span class="meta">（Windows 也可以直接双击 <code>start.bat</code>，检测不到 Node 时会用 winget 帮你装。）</span></li>
+  <li>启动：<strong>Windows</strong> 双击 <code>start.bat</code>；<strong>macOS / Linux</strong> 运行 <code>./start.sh</code>。
+    <br /><span class="meta">首次会自动安装依赖，约需一两分钟。看到「共享新闻池 已启动」就成了。</span></li>
+  <li>浏览器会自动打开 <code>http://localhost:3210</code>。
+    <br /><span class="meta">那个黑色窗口就是服务本身，关掉它 = 停止服务。</span></li>
+  <li>让别人也能访问：查本机局域网 IP（Windows 运行 <code>ipconfig</code> 找「IPv4 地址」，一般是 <code>192.168.x.x</code>），
+      然后让访客打开 <code>http://192.168.x.x:3210</code>。
+      <br /><span class="meta">若连不上：Windows 弹出防火墙提示时选「允许」；或在管理员命令行放行端口：
+      <code>netsh advfirewall firewall add rule name="news-pool" dir=in action=allow protocol=TCP localport=3210</code></span></li>
+</ol>
+<div class="callout danger">
+  <strong>⚠️ 正式使用前必做：改掉默认密码。</strong>
+  默认账号 <code>alice</code> / <code>bob</code> / <code>carol</code>，密码均为 <code>123456</code>；
+  成员模式（管理员）密码 <code>admin888</code>。要暴露到局域网之外时，尤其必须先改。
+</div>
+</section>
+
+<section>
+<h2>四、给访客（那两位只需 3 步）</h2>
+<ol>
+  <li><strong>打开网址</strong>：浏览器地址栏输入主播给你的网址，回车。</li>
+  <li><strong>登录</strong>：输入主播给你的账号和密码。</li>
+  <li><strong>开始用</strong>：看到新闻清单就成了。</li>
+</ol>
+<p>打不开时：确认和主播在同一个 WiFi（局域网方式），或者向主播要最新网址。</p>
+</section>
+
+<section>
+<h2>五、常用操作</h2>
+<table>
+  <thead><tr><th style="width:34%">想干什么</th><th>怎么做</th></tr></thead>
+  <tbody>
+    <tr><td>加一条新闻</td><td>点「加新闻」，粘贴链接或直接写标题；也可全页拖拽、页面空白处 <kbd>Ctrl</kbd>+<kbd>V</kbd></td></tr>
+    <tr><td>自动抓标题</td><td>粘贴网页链接即可；X / Twitter 链接会自动取回推文正文</td></tr>
+    <tr><td>标记 待播 / 已播</td><td>点新闻右侧的<strong>状态胶囊</strong>一键切换（会记录是谁播的）</td></tr>
+    <tr><td>标重点</td><td>点 <code>☆</code>；顶部「★ 重点」标签可只看重点</td></tr>
+    <tr><td>核查真伪</td><td>点开该条 → 「核查」，会列出其他来源的同题报道</td></tr>
+    <tr><td>写备注</td><td>添加时可直接填；之后在条目的 <code>⋯</code> 菜单里「加备注 / 改备注」（备注里的网址可点开）</td></tr>
+    <tr><td>移动日期 / 略过</td><td>条目 <code>⋯</code> 菜单里；日期分组右侧可把当天未播出的整体顺延</td></tr>
+    <tr><td>复制 / 导出</td><td><code>⋯</code> → 复制「标题+备注+链接」；顶栏「导出当天」可按人导出清单</td></tr>
+    <tr><td>看统计</td><td>顶栏「统计」→ 月历网格，逐日查看每人「准备 / 已播」条数</td></tr>
+    <tr><td>换外观</td><td>顶栏「外观」→ 10 套主题任选，立即生效并记住</td></tr>
+  </tbody>
+</table>
+</section>
+
+<section>
+<h2>六、界面外观（10 套主题）</h2>
+<p>顶栏「<strong>外观</strong>」里挑一套，点一下立即生效并自动记住。内置：经典·暖灰、暗调编辑、暗夜玻璃、工业蓝图、战术终端、软结构、暖金奢品、氰版蓝图、双色丝网、层叠卡片、赛博霓虹。</p>
+<ul>
+  <li>只存在<strong>你自己的浏览器</strong>里（localStorage），别人完全不受影响；</li>
+  <li><strong>不加载任何在线字体</strong> —— 守住「只发少数几类外部请求」的承诺。</li>
+</ul>
+</section>
+
+<section>
+<h2>七、安全与隐私（可自行核验）</h2>
+<p>本程序源码完全开放，所有逻辑都在 <code>src/</code> 里，可逐行检查。</p>
+<ul>
+  <li><strong>数据全部存在本地</strong>：新闻、账号、密码（bcrypt 哈希）都写在 <code>data/</code> 目录，不上传任何服务器；没有埋点、没有遥测。</li>
+  <li><strong>只依赖 3 个运行时包</strong>：<code>bcryptjs</code>、<code>better-sqlite3</code>、<code>ws</code>（均为宽松的 MIT/ISC 类许可证）。</li>
+  <li><strong>只有 4 类主动外联</strong>，且都必须由你亲自触发：抓网页标题、核查搜索（DuckDuckGo / Bing）、X 取正文。</li>
+</ul>
+<h3>自己验证的三种方法</h3>
+<ol>
+  <li><strong>跑自查脚本</strong>：<code>npm run audit</code> —— 打印依赖清单、所有外联点、域名白名单与危险模式检查。</li>
+  <li><strong>断网测试</strong>：关掉网络后，除「核查 / 抓标题」外功能照常 —— 说明它不偷传数据。</li>
+  <li><strong>亲眼看它连了谁</strong>：浏览器按 <kbd>F12</kbd> → Network 面板，正常使用几分钟，绝大多数请求都是 <code>localhost</code>。</li>
+</ol>
+<p class="meta">详见仓库 <code>SECURITY.md</code> 与 <code>npm run audit</code>。</p>
+</section>
+
+<section>
+<h2>八、常见问题</h2>
+<h3>别人打不开我的网址？</h3>
+<ul>
+  <li>确认在同一 WiFi（局域网方式）；确认服务窗口还开着；</li>
+  <li>Windows 防火墙放行端口 3210（见第三节第 4 步）；</li>
+  <li>用 IP 而不是 <code>localhost</code> —— <code>localhost</code> 只对主机自己有效。</li>
+</ul>
+<h3>「核查」一直失败？</h3>
+<p>核查要访问外部搜索引擎，网络不通或被限流时就会失败。这不影响其它功能（加新闻、改状态、写备注都可离线用）。</p>
+<h3>怎么彻底清空、重来？</h3>
+<p>关掉服务，删掉项目里的 <code>data/</code> 目录，再启动即可（会重新生成默认账号）。</p>
+<h3>忘了密码？</h3>
+<p>删掉 <code>data/</code> 重来，或用管理员进入「成员模式」重置。</p>
+</section>
+
+<section>
+<h2>九、版本与校验</h2>
+<p>发布包附带 SHA256 校验值，用于确认下载到的文件没被中途掉包。</p>
+<pre>Windows :  Get-FileHash .\news-pool-vX.Y.Z.zip -Algorithm SHA256
+macOS/Linux :  shasum -a 256 news-pool-vX.Y.Z.zip</pre>
+<p>把算出来的值和发布页上写的一致，即说明文件完整。</p>
+</section>
+
+<footer>
+共享新闻池 · 开源(MIT) · 仓库：https://github.com/wdz316/news-pool<br />
+本手册由项目内 <code>docs/使用手册.html</code> 生成（<code>npm run manual</code>）。
+</footer>
+
+</body>
+</html>

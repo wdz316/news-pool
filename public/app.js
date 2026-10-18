@@ -905,10 +905,16 @@ function buildItemMenu(it) {
     closeMenu();
     if (willOpen) {
       pop.classList.remove('hidden');
+      pop.classList.remove('up');
       btn.setAttribute('aria-expanded', 'true');
       // 抬高本卡，避免菜单被下一张卡（尤其已播/略过卡的 opacity 层叠上下文）遮住
       const card = wrap.closest('.item');
       if (card) card.classList.add('menu-open');
+      // 卡片贴近窗口底部时向上弹，避免菜单被窗口下沿切掉
+      const box = pop.getBoundingClientRect();
+      if (box.bottom > window.innerHeight - 8 && box.height < wrap.getBoundingClientRect().top) {
+        pop.classList.add('up');
+      }
     }
   });
 

@@ -1,9 +1,13 @@
 {
   "name": "news-pool",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "共享新闻池 - 多人协作的实时待播新闻池（本地优先，零构建）",
   "main": "src/server.js",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wdz316/news-pool.git"
+  },
   "engines": {
     "node": ">=18"
   },
@@ -11,7 +15,9 @@
     "start": "node src/server.js",
     "test": "node verify/smoke.cjs",
     "smoke": "node verify/smoke.cjs",
-    "audit": "node scripts/audit.cjs"
+    "audit": "node scripts/audit.cjs",
+    "manual": "node scripts/manual.cjs",
+    "release": "node scripts/publish.cjs"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -120,7 +120,7 @@ npm run audit
 7. 顶栏 **统计** → 月历网格，确认每天的「准备 / 已播」数。
 8. 顶栏 **外观** → 挑一套风格（如「暗夜玻璃」「赛博霓虹」）→ 界面立即变样；刷新后仍是你选的；换个浏览器 / 无痕窗口仍是默认（各人各选）。
 
-自动化冒烟测试（119 项）：
+自动化冒烟测试（129 项）：
 
 ```bash
 npm test        # 或 node verify/smoke.cjs
@@ -165,6 +165,16 @@ git push -u origin main
 ```
 
 别人拿到后，按上面「一键安装」即可；或把 `安装提示词.md` 发给他们的 AI。
+
+> **源代码已经在这里，您可以使用 AI 代理进行修改** —— 把仓库地址丢给 Codex / Claude Code / Cursor 等任意 AI 编程助手，让它直接读代码、按你的需求改（改完照常跑 `npm test` 验证即可）。
+
+### 一键发布（改完代码后）
+
+```bash
+npm run release          # 按 package.json 的 version 自动：同步 → 提交 → 推送 → 打 tag → 出 zip + SHA256 → 建 GitHub Release
+npm run release -- --yes # 跳过确认
+npm run manual           # 用本机 Edge/Chrome 把 docs/使用手册.html 打成 PDF（可选）
+```
 
 ## ⚠️ 部署到公网（进阶）
 
