@@ -752,6 +752,8 @@ html, body { font-family: var(--font); }
 [data-theme="neon"] .item-badge { text-shadow: 0 0 8px currentColor; }
 [data-theme="neon"] button.primary { box-shadow: 0 0 26px -6px var(--amber); }
 [data-theme="neon"] .item { border-left-width: 3px; }
+/* neon 卡片的切角（clip-path）会连带裁掉向下溢出的「⋯」菜单；菜单展开时临时取消切角 */
+[data-theme="neon"] .item.menu-open { clip-path: none; }
 
 /* ---------- 外观设置面板 ---------- */
 .theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 12px; }

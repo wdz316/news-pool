@@ -450,6 +450,8 @@ async function main() {
     check(/\.item\.menu-open\s*\{[^}]*z-index/.test(css), '抬高层明确设置了 z-index');
     check(js.includes("classList.add('menu-open')"), 'app.js 展开菜单时给卡片加 menu-open');
     check(js.includes("remove('menu-open')"), 'app.js closeMenu 会移除 menu-open（放下卡片）');
+    check(js.includes("closest('.item')"), 'app.js 用 closest(.item) 定位并抬高卡片');
+    check(/\[data-theme="neon"\]\s*\.item\.menu-open\s*\{[^}]*clip-path:\s*none/.test(css), '赛博霓虹：菜单展开时取消切角 clip-path（否则菜单被裁）');
 
     console.log('\n[13] 傻瓜安装 / 无后门自证 交付物检查');
     const readRoot = (rel) => { try { return fs.readFileSync(path.join(__dirname, '..', rel), 'utf8'); } catch { return ''; } };
